@@ -15,18 +15,58 @@
 			h: window.innerHeight
 		}
 		let mouse = {
-			x: 0,
-			y: 0
+			x: -100,
+			y: -100
 		}
+		let touch: any[] = [];
 
 		canvas.width  = win.w;
 		canvas.height = win.h;
 
 		window.addEventListener (
 			'mousemove',
-			function (event) {
-				mouse.x = event.x;
-				mouse.y = event.y;
+			(e) => {
+				mouse.x = e.x;
+				mouse.y = e.y;
+			}
+		)
+
+		window.addEventListener (
+			'touchstart',
+			(e) => {
+				for (let t of e.changedTouches) {
+					touch.push(t);
+				}
+			}
+		)
+
+		window.addEventListener (
+			'touchmove',
+			(e) => {
+				for (let t of e.changedTouches) {
+					for (let i=0; i<touch.length; ++i) {
+						if (t.target == touch[i].target) {
+							touch[i] = t;
+							if (i >= touch.length) break;
+							continue;
+						}
+					}
+				}
+			}
+		)
+
+		window.addEventListener (
+			'touchend',
+			(e) => {
+				for (let t of e.changedTouches) {
+					for (let i=0; i<touch.length; ++i) {
+						if (t.target == touch[i].target) {
+							touch.splice(i, 1);
+							if (i >= touch.length) break;
+							continue;
+						}
+					}
+				}
 			}
 		)
 
@@ -99,8 +139,21 @@
 					if (this.r < 30) {
 						this.r += 15;
 					}
-				} else if (this.r > 5) {
-					this.r--;
+				} else {
+					for (let t of touch)
+					{
+						if (t.clientX - this.x <   50 &&
+							t.clientX - this.x > - 50 &&
+							t.clientY - this.y <   50 &&
+							t.clientY - this.y > - 50) {
+							if (this.r < 15) {
+								this.r += 10;
+							}
+						}
+					}
+					if (this.r > 5) {
+						this.r--;
+					}
 				}
 				this.x += this.dx;
 				this.y += this.dy;
@@ -117,11 +170,11 @@
 		}
 
 		const colors: string[] = [
-								'#ffaa33',
-								'#ggffaa',
-								'#00ff00',
-								'#4411aa',
-								'#ff1100'
+								'#012030',
+								'#13678a',
+								'#45c4b0',
+								'#9aeba3',
+								'#dafdba'
 								];
 
 		let circles: Array<Circle> = [];
