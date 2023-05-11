@@ -1,5 +1,22 @@
-<script setup lang="ts">
+<script setup lang='ts'>
 	import { ref, onMounted } from 'vue';
+
+	const props = defineProps({
+		fullscreen: {
+			type: Boolean,
+			default: false,
+		},
+		width: {
+			type: Number,
+			default: 300,
+			validator: (value: number) => Number.isInteger(value)
+		},
+		height: {
+			type: Number,
+			default: 400,
+			validator: (value: number) => Number.isInteger(value)
+		}
+	});
 
 	const canvasRef = ref<HTMLCanvasElement | null>(null);
 
@@ -11,8 +28,8 @@
 
 		const ctx = context;
 		let win = {
-			w: window.innerWidth,
-			h: window.innerHeight
+			w: 300,
+			h: 400
 		}
 		let mouse = {
 			x: - 200,
@@ -21,8 +38,53 @@
 		let touch: any[] = [];
 		let ballNum = 100;
 
+		if (props.fullscreen) {
+			window.addEventListener (
+				'resize',
+				function () {
+					win.w = window.innerWidth;
+					win.h = window.innerHeight;
+					ctx.canvas.width  = win.w;
+					ctx.canvas.height = win.h;
+				}
+			)
+			win.w = window.innerWidth;
+			win.h = window.innerHeight;
+		} else {
+			win.w = props.width;
+			win.h = props.height;
+		}
+
 		canvas.width  = win.w;
 		canvas.height = win.h;
+
+		const rect = canvas.getBoundingClientRect();
+
+		const colors: string[] = [
+								'#012030',
+								'#13678a',
+								'#45c4b0',
+								'#9aeba3',
+								'#dafdba'
+								];
+		const colorsLength = colors.length;
+		const borderColorIndex = getRandom(0, colorsLength - 1);
+		const borderColorStroke = colors[borderColorIndex];
+		const borderColorFill = colors[borderColorIndex + 1 % colorsLength];
+
+		function createBall(): Circle {
+			let dx = getRandom(-2, 2);
+			while (dx == 0) dx = getRandom(-2, 2);
+			let dy = getRandom(-2, 2);
+			while (dy == 0) dy = getRandom(-2, 2);
+			const { x, y, radius, color } = {
+				x: getRandom(0, win.w),
+				y: getRandom(0, win.h),
+				radius: getRandom(5, 5),
+				color: colors[getRandom(0, colorsLength - 1)]
+			};
+			return new Circle(x, y, dx, dy, radius, color);
+		}
 
 		// Computer
 		window.addEventListener (
@@ -93,16 +155,6 @@
 			}
 		);
 
-		window.addEventListener (
-			'resize',
-			function () {
-				win.w = window.innerWidth;
-				win.h = window.innerHeight;
-				ctx.canvas.width  = win.w;
-				ctx.canvas.height = win.h;
-			}
-		)
-
 		canvas.style.background = '#ffffff';
 
 		// Essential functions
@@ -121,7 +173,7 @@
 			draw: () => void;
 			update: () => void;
 		}
-		
+
 		class Circle implements CircleInterface {
 			x: number;
 			y: number;
@@ -151,25 +203,33 @@
 				ctx.fill();
 			}
 
-			update(): void {
+			move(): void {
 				if (this.x - this.r < 0)     this.dx = Math.abs(this.dx);
 				if (this.x + this.r > win.w) this.dx = - Math.abs(this.dx);
 				if (this.y - this.r < 0)     this.dy = Math.abs(this.dy);
 				if (this.y + this.r > win.h) this.dy = - Math.abs(this.dy);
-				if (mouse.x - this.x <   win.w/20 &&
-					mouse.x - this.x > - win.w/20 &&
-					mouse.y - this.y <   win.w/20 &&
-					mouse.y - this.y > - win.w/20) {
+
+				this.x += this.dx;
+				this.y += this.dy;
+			}
+
+			handleTouch(): void {
+				const x = this.x + rect.left;
+				const y = this.y + rect.top;
+				if (mouse.x - x <   win.w/20 &&
+					mouse.x - x > - win.w/20 &&
+					mouse.y - y <   win.w/20 &&
+					mouse.y - y > - win.w/20) {
 					if (this.r < Math.max(win.w/20, 75)) {
 						this.r += 10;
 					}
 				} else {
 					for (let t of touch)
 					{
-						if (t.clientX - this.x <   win.w/20 &&
-							t.clientX - this.x > - win.w/20 &&
-							t.clientY - this.y <   win.w/20 &&
-							t.clientY - this.y > - win.w/20) {
+						if (t.clientX - x <   win.w/20 &&
+							t.clientX - x > - win.w/20 &&
+							t.clientY - y <   win.w/20 &&
+							t.clientY - y > - win.w/20) {
 							if (this.r < Math.max(win.w/20, 75)) {
 								this.r += 10;
 							}
@@ -179,8 +239,11 @@
 						this.r--;
 					}
 				}
-				this.x += this.dx;
-				this.y += this.dy;
+			}
+
+			update(): void {
+				this.handleTouch();
+				this.move();
 				ctx.setLineDash([]);
 				this.draw();
 			}
@@ -240,32 +303,6 @@
 			requestAnimationFrame(drawAnimation);
 		}
 
-		const colors: string[] = [
-								'#012030',
-								'#13678a',
-								'#45c4b0',
-								'#9aeba3',
-								'#dafdba'
-								];
-		const colorsLength = colors.length;
-		const borderColorIndex = getRandom(0, colorsLength - 1);
-		const borderColorStroke = colors[borderColorIndex];
-		const borderColorFill = colors[borderColorIndex + 1 % colorsLength];
-
-		function createBall(): Circle {
-			let dx = getRandom(-2, 2);
-			while (dx == 0) dx = getRandom(-2, 2);
-			let dy = getRandom(-2, 2);
-			while (dy == 0) dy = getRandom(-2, 2);
-			const { x, y, radius, color } = {
-				x: getRandom(0, win.w),
-				y: getRandom(0, win.h),
-				radius: getRandom(5, 5),
-				color: colors[getRandom(0, colorsLength - 1)]
-			};
-			return new Circle(x, y, dx, dy, radius, color);
-		}
-
 		let circles: Array<Circle> = [];
 		for (let i = 0; i < ballNum; i++) {
 			circles.push(createBall());
@@ -280,5 +317,5 @@
 </template>
 
 <style scoped>
-	@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 </style>

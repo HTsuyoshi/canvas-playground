@@ -1,16 +1,14 @@
 import { createApp } from 'vue'
-import { createRouter, createWebHistory } from 'vue-router'
 import './style.css'
-import App from './App.vue'
+import App from './pages/App.vue'
+import router from './router'
 
+const app = createApp(App);
 
-const router = createRouter({
-	history: createWebHistory(),
-	routes: [
-		{ path: '/', component: App},
-//		{ path: '/about', component: AboutComponent },
-//		{ path: '/home', component: HomeComponent },
-	]
-})
+app.use(router).mount('#app');
 
-createApp(App).use(router).mount('#app')
+app.config.errorHandler = (err, instance, info) => {
+	console.log(err);
+	console.log(instance);
+	console.log(info);
+};
