@@ -41,6 +41,8 @@
 						circles.push(createBall());
 				if (e.clientX < win.w/2)
 					circles.splice(0, 10);
+				ctx.strokeStyle = borderColorStroke;
+				ctx.fillStyle = borderColorFill;
 			}
 		)
 
@@ -179,6 +181,7 @@
 				}
 				this.x += this.dx;
 				this.y += this.dy;
+				ctx.setLineDash([]);
 				this.draw();
 			}
 		}
@@ -186,9 +189,19 @@
 		function border() {
 			const border = 10;
 			const gap = 5;
-
 			ctx.strokeStyle = borderColorStroke;
 			ctx.fillStyle = borderColorFill;
+
+			ctx.lineWidth = 2;
+			ctx.setLineDash([5, 1, 5]);
+			ctx.moveTo(win.w/2, 30);
+			ctx.lineTo(win.w/2, (win.h/2) - 90);
+			ctx.stroke();
+			ctx.moveTo(win.w/2, (win.h/2) + 60);
+			ctx.lineTo(win.w/2, win.h - 30);
+			ctx.stroke();
+			ctx.setLineDash([]);
+
 			ctx.lineWidth = 2;
 			ctx.strokeRect(border, border, win.w - (2*border), win.h - (2*border));
 
