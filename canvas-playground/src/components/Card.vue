@@ -7,10 +7,6 @@
 			type: String,
 			required: true
 		},
-		description: {
-			type: String,
-			required: true
-		},
 		img: {
 			type: String,
 			required: true
@@ -27,7 +23,6 @@
 	<div class='card'>
 		<img :src='img'>
 		<p>{{ title }}</p>
-		<p>{{ description }}</p>
 	</div>
 	</router-link>
 </template>
@@ -49,6 +44,8 @@ a {
     box-shadow: #aaaaaa 5px 5px 10px 5px;
 	
 	transition: transform .3s ease-out;
+
+	margin: 1em;
 }
 .card:hover {
 	transform: translate(0, 0.1em);

@@ -29,131 +29,135 @@
 		const ctx = context;
 		let win = {
 			w: 300,
-			h: 400
+			w2: 150,
+			h: 400,
+			h2: 200
 		}
 		let mouse = {
-			x: - 200,
-			y: - 200
+			x: 0,
+			y: 0
 		}
-		let touch: any[] = [];
-		let ballNum = 100;
+		let ballNum = 50;
 
 		if (props.fullscreen) {
 			window.addEventListener (
 				'resize',
 				function () {
 					win.w = window.innerWidth;
+					win.w2 = window.innerWidth/2;
 					win.h = window.innerHeight;
+					win.h2 = window.innerHeight/2;
 					ctx.canvas.width  = win.w;
 					ctx.canvas.height = win.h;
 				}
 			)
 			win.w = window.innerWidth;
+			win.w2 = window.innerWidth/2;
 			win.h = window.innerHeight;
+			win.h2 = window.innerHeight/2;
 		} else {
 			win.w = props.width;
+			win.w2 = props.width/2;
 			win.h = props.height;
+			win.h2 = props.height/2;
 		}
 
 		canvas.width  = win.w;
 		canvas.height = win.h;
 
-		const rect = canvas.getBoundingClientRect();
-
 		const colors: string[] = [
-								'#012030',
-								'#13678a',
-								'#45c4b0',
-								'#9aeba3',
-								'#dafdba'
+								'#9c13bf',
+								'#4f217f',
+								'#ff12fb',
+								'#0b1240',
+								'#e5006a'
 								];
 		const colorsLength = colors.length;
 		const borderColorIndex = getRandom(0, colorsLength - 1);
 		const borderColorStroke = colors[borderColorIndex];
-		const borderColorFill = colors[borderColorIndex + 1 % colorsLength];
+		const borderColorFill = colors[(borderColorIndex + 1) % colorsLength];
 
 		function createBall(): Circle {
 			let dx = getRandom(-2, 2);
 			while (dx == 0) dx = getRandom(-2, 2);
 			let dy = getRandom(-2, 2);
 			while (dy == 0) dy = getRandom(-2, 2);
-			const { x, y, radius, color } = {
+			const { x, y, radius, color, friction } = {
 				x: getRandom(0, win.w),
 				y: getRandom(0, win.h),
 				radius: getRandom(5, 5),
-				color: colors[getRandom(0, colorsLength - 1)]
+				color: colors[getRandom(0, colorsLength - 1)],
+				friction: Math.random()
 			};
-			return new Circle(x, y, dx, dy, radius, color);
+			return new Circle(x, y, dx, dy, radius, color, friction);
+		}
+
+		function isMobileDevice() {
+			return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 		}
 
 		// Computer
-		window.addEventListener (
-			'mousemove',
-			(e) => {
-				mouse.x = e.x;
-				mouse.y = e.y;
-			}
-		)
+		if (!isMobileDevice()) {
+			window.addEventListener (
+				'mousemove',
+				(e) => {
+					mouse.x = e.x;
+					mouse.y = e.y;
+
+					const x = mouse.x - (win.w2);
+					const y = mouse.y - (win.h2);
+					let magnitude = Math.sqrt(x*x + y*y);
+					gravity = 250*magnitude/((win.w2)*(win.w2) + (win.h2)*(win.h2));
+					gravityDirection.x = x/magnitude;
+					gravityDirection.y = y/magnitude;
+				}
+			)
+		}
 
 		window.addEventListener (
 			'click',
 			(e) => {
-				if (e.clientX > win.w/2)
+				if (e.clientX > win.w2)
 					for (let i = 0; i < 10; i++)
 						circles.push(createBall());
-				if (e.clientX < win.w/2)
+				if (e.clientX < win.w2)
 					circles.splice(0, 10);
 				ctx.strokeStyle = borderColorStroke;
 				ctx.fillStyle = borderColorFill;
 			}
 		)
 
-		// Cellphone
-		window.addEventListener (
-			'touchstart',
-			(e) => {
-				for (let t of e.changedTouches) {
-					if (t.clientX > win.w/2)
-						for (let i = 0; i < 10; i++)
-							circles.push(createBall());
-					if (t.clientX < win.w/2)
-						circles.splice(0, 10);
-					touch.push(t);
-				}
-				ctx.strokeStyle = borderColorStroke;
-				ctx.fillStyle = borderColorFill;
-			}
-		)
+		if (isMobileDevice()) {
+			if (window.DeviceOrientationEvent) {
+				window.addEventListener(
+				'deviceorientation',
+				(e) => {
+					//let alpha = e.alpha;
+					let beta  = e.beta;
+					if (beta === null) beta = 0;
+					let gamma = e.gamma;
+					if (gamma === null) gamma = 0;
 
-		window.addEventListener (
-			'touchmove',
-			(e) => {
-				for (let t of e.changedTouches)
-					for (let i=0; i<touch.length; ++i)
-						if (t.target == touch[i].target)
-							touch[i] = t;
-			}
-		)
+					gravityDirection.x = 2*gamma / 90;
+					gravityDirection.y = 2*beta / 90;
+				});
+			} else {
+				window.addEventListener (
+					'mousemove',
+					(e) => {
+						mouse.x = e.x;
+						mouse.y = e.y;
 
-		window.addEventListener (
-			'touchend',
-			(e) => {
-			for (let t of e.changedTouches) {
-				const index = touch.findIndex(item => item.target === t.target);
-					if (index !== -1) touch.splice(index, 1);
-				}
+						const x = mouse.x - (win.w2);
+						const y = mouse.y - (win.h2);
+						let magnitude = Math.sqrt(x*x + y*y);
+						gravity = 250*magnitude/((win.w2)*(win.w2) + (win.h2)*(win.h2));
+						gravityDirection.x = x/magnitude;
+						gravityDirection.y = y/magnitude;
+					}
+				)
 			}
-		)
-
-		window.addEventListener(
-			'touchcancel',
-			(e) => {
-			for (let t of e.changedTouches) {
-				const index = touch.findIndex(item => item.target === t.target);
-					if (index !== -1) touch.splice(index, 1);
-				}
-			}
-		);
+		}
 
 		canvas.style.background = '#ffffff';
 
@@ -169,82 +173,81 @@
 			dx: number;
 			dy: number;
 			r: number;
+			friction: number;
 			color: string;
 			draw: () => void;
 			update: () => void;
 		}
 
+		var gravity = 0.5;
+		var gravityDirection = {
+			x: 0,
+			y: 1
+		};
 		class Circle implements CircleInterface {
 			x: number;
 			y: number;
 			dx: number;
 			dy: number;
 			r: number;
+			friction: number;
 			color: string;
 
 			// Shapes functions
 			constructor(x: number, y: number,
 						dx: number, dy: number,
-						r: number, color: string) {
+						r: number, color: string,
+						friction: number) {
 				this.x = x;
 				this.y = y;
 				this.dx = dy;
 				this.dy = dx;
 				this.r = r;
 				this.color = color;
+				this.friction = friction;
 			}
 
 			draw(): void {
 				ctx.beginPath();
 				ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-				ctx.strokeStyle = this.color;
-				ctx.stroke();
 				ctx.fillStyle = this.color;
 				ctx.fill();
+				ctx.strokeStyle = borderColorStroke;
+				ctx.moveTo(this.x, this.y);
+				ctx.lineTo(this.x + this.dx*3, this.y + this.dy*3);
+				ctx.stroke();
 			}
 
 			move(): void {
-				if (this.x - this.r < 0)     this.dx = Math.abs(this.dx);
-				if (this.x + this.r > win.w) this.dx = - Math.abs(this.dx);
-				if (this.y - this.r < 0)     this.dy = Math.abs(this.dy);
-				if (this.y + this.r > win.h) this.dy = - Math.abs(this.dy);
+				if (this.y + this.r <= win.h && this.y - this.r >= 0)
+					this.dy += gravity * gravityDirection.y;
+				if (this.x + this.r <= win.w && this.x - this.r >= 0)
+					this.dx += gravity * gravityDirection.x;
 
 				this.x += this.dx;
 				this.y += this.dy;
-			}
 
-			handleTouch(): void {
-				const x = this.x + rect.left;
-				const y = this.y + rect.top;
-				if (mouse.x - x <   win.w/20 &&
-					mouse.x - x > - win.w/20 &&
-					mouse.y - y <   win.w/20 &&
-					mouse.y - y > - win.w/20) {
-					if (this.r < Math.max(win.w/20, 75)) {
-						this.r += 10;
-					}
-				} else {
-					for (let t of touch)
-					{
-						if (t.clientX - x <   win.w/20 &&
-							t.clientX - x > - win.w/20 &&
-							t.clientY - y <   win.w/20 &&
-							t.clientY - y > - win.w/20) {
-							if (this.r < Math.max(win.w/20, 75)) {
-								this.r += 10;
-							}
-						}
-					}
-					if (this.r > 5) {
-						this.r--;
-					}
+				if (this.x - this.r < 0) {
+					this.dx = Math.abs(this.dx) * this.friction;
+					this.x = this.r;
 				}
+				if (this.x + this.r > win.w) {
+					this.dx = - Math.abs(this.dx) * this.friction;
+					this.x = win.w - this.r;
+				}
+				if (this.y - this.r < 0) {
+					this.dy = Math.abs(this.dy) * this.friction;
+					this.y = this.r;
+				}
+				if (this.y + this.r > win.h) {
+					this.dy = - Math.abs(this.dy) * this.friction;
+					this.y = win.h - this.r;
+				}
+
 			}
 
 			update(): void {
-				this.handleTouch();
 				this.move();
-				ctx.setLineDash([]);
 				this.draw();
 			}
 		}
@@ -257,33 +260,36 @@
 
 			ctx.lineWidth = 2;
 			ctx.setLineDash([5, 1, 5]);
-			ctx.moveTo(win.w/2, 30);
-			ctx.lineTo(win.w/2, (win.h/2) - 90);
-			ctx.stroke();
-			ctx.moveTo(win.w/2, (win.h/2) + 60);
-			ctx.lineTo(win.w/2, win.h - 30);
+			ctx.beginPath();
+			ctx.moveTo(win.w2, 30);
+			ctx.lineTo(win.w2, (win.h2) - 90);
+			ctx.moveTo(win.w2, (win.h2) + 65);
+			ctx.lineTo(win.w2, win.h - 30);
 			ctx.stroke();
 			ctx.setLineDash([]);
 
+			let offset = border;
 			ctx.lineWidth = 2;
-			ctx.strokeRect(border, border, win.w - (2*border), win.h - (2*border));
+			ctx.strokeRect(border, border, win.w - 2*offset, win.h - 2*offset);
 
+			offset += gap;
 			ctx.lineWidth = 5;
-			ctx.strokeRect(gap + border, gap + border, win.w - (2*gap + 2*border), win.h- (2*gap + 2* border));
+			ctx.strokeRect(offset, offset, win.w - 2*offset, win.h - 2*offset);
 
+			offset += gap;
 			ctx.lineWidth = 2;
-			ctx.strokeRect(2*gap + border, 2*gap + border, win.w - (2*2*gap + 2*border), win.h - (2*2*gap + 2*border));
+			ctx.strokeRect(offset, offset, win.w - 2*offset, win.h - 2*offset);
 
-			const offset = 3;
-			let title = 'Github';
+			const offsetLetter = 3;
+			let title = 'Gravity';
 			ctx.font = `100px Bebas Neue`;
-			ctx.fillText(title, (win.w/2) - (ctx.measureText(title).width / 2), win.h/2);
-			ctx.strokeText(title, (win.w/2) - offset - (ctx.measureText(title).width / 2), (win.h/2) - offset);
+			ctx.fillText(title, (win.w2) - (ctx.measureText(title).width / 2), win.h2);
+			ctx.strokeText(title, (win.w2) - offsetLetter - (ctx.measureText(title).width / 2), (win.h2) - offsetLetter);
 
 			title = '/Htsuyoshi';
 			ctx.font = `50px Bebas Neue`;
-			ctx.fillText(title, (win.w/2) - (ctx.measureText(title).width / 2), win.h/2 + 50);
-			ctx.strokeText(title, (win.w/2) - offset - (ctx.measureText(title).width / 2), (win.h/2) + 50 - offset);
+			ctx.fillText(title, (win.w2) - (ctx.measureText(title).width / 2), win.h2 + 50);
+			ctx.strokeText(title, (win.w2) - offsetLetter - (ctx.measureText(title).width / 2), (win.h2) + 50 - offsetLetter);
 
 			title = 'ADD';
 			ctx.font = `30px Bebas Neue`;

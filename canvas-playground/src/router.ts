@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from './pages/Home.vue'
-import Balls from './pages/Balls.vue'
+import Hover from './pages/Hover.vue'
+import Gravity from './pages/Gravity.vue'
 
 const router = createRouter({
 	history: createWebHistory(),
@@ -11,9 +12,14 @@ const router = createRouter({
 			component: Home
 		},
 		{
-			path: '/canvas/balls',
-			name: 'Balls',
-			component: Balls
+			path: '/canvas/hover',
+			name: 'Hover',
+			component: Hover
+		},
+		{
+			path: '/canvas/gravity',
+			name: 'Gravity',
+			component: Gravity
 		},
 	]
 })

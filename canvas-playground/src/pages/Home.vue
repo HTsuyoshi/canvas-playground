@@ -2,17 +2,25 @@
 	import Card from '../components/Card.vue'
 
 	const project_1 = {
-		title: 'Balls',
-		description: 'Project',
-		link: '/canvas/balls',
-		img: '/canvas/imgs/balls.png',
+		title: 'Hover',
+		link: '/canvas/hover',
+		img: '/canvas/imgs/hover.png',
+	}
+
+	const project_2 = {
+		title: 'Gravity',
+		link: '/canvas/gravity',
+		img: '/canvas/imgs/gravity.png',
 	}
 </script>
 
 <template>
-	<div id="background">
+	<div id='background'>
 		<h1>Canvas Projects</h1>
-		<Card :title='project_1.title' :description='project_1.description' :link='project_1.link' :img='project_1.img'></Card>
+		<div id='card-list'>
+			<Card :title='project_1.title' :link='project_1.link' :img='project_1.img'></Card>
+			<Card :title='project_2.title' :link='project_2.link' :img='project_2.img'></Card>
+		</div>
 	</div>
 </template>
 
@@ -32,5 +40,10 @@
 }
 #background h1 {
 	font-family: Monoton;
+	color: #000000;
+}
+#card-list {
+	display: flex;
+	justify-content: center;
 }
 </style>
