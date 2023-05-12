@@ -27,23 +27,27 @@
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Monoton&display=swap');
 #background {
-	width: 100vw;
-	height: 100vh;
 	background-color: #ffffff;
+
+	min-height: 100vh;
 
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	flex-direction: column;
+	flex-wrap: wrap;
 
 	font-size: 1.5em;
 }
 #background h1 {
 	font-family: Monoton;
 	color: #000000;
+	margin: 0.2em;
+	text-align: center;
 }
 #card-list {
 	display: flex;
 	justify-content: center;
+	flex-wrap: wrap;
 }
 </style>
