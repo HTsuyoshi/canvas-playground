@@ -12,6 +12,12 @@
 		link: '/canvas/gravity',
 		img: '/canvas/imgs/gravity.png',
 	}
+
+	const project_3 = {
+		title: 'Collision',
+		link: '/canvas/collision',
+		img: '/canvas/imgs/collision.png',
+	}
 </script>
 
 <template>
@@ -20,6 +26,7 @@
 		<div id='card-list'>
 			<Card :title='project_1.title' :link='project_1.link' :img='project_1.img'></Card>
 			<Card :title='project_2.title' :link='project_2.link' :img='project_2.img'></Card>
+			<Card :title='project_3.title' :link='project_3.link' :img='project_3.img'></Card>
 		</div>
 	</div>
 </template>
@@ -30,6 +37,7 @@
 	background-color: #ffffff;
 
 	min-height: 100vh;
+	min-width: 100vw;
 
 	display: flex;
 	justify-content: center;
