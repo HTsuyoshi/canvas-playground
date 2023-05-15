@@ -3,6 +3,7 @@ import Home from './pages/Home.vue'
 import Hover from './pages/Hover.vue'
 import Gravity from './pages/Gravity.vue'
 import Collision from './pages/Collision.vue'
+import Chaos from './pages/Chaos.vue'
 
 const router = createRouter({
 	history: createWebHistory(),
@@ -26,6 +27,11 @@ const router = createRouter({
 			path: '/canvas/collision',
 			name: 'Collision',
 			component: Collision
+		},
+		{
+			path: '/canvas/chaos',
+			name: 'Chaos',
+			component: Chaos
 		},
 	]
 })

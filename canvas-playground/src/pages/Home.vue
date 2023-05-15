@@ -18,6 +18,12 @@
 		link: '/canvas/collision',
 		img: '/canvas/imgs/collision.png',
 	}
+
+	const project_4 = {
+		title: 'Chaos',
+		link: '/canvas/chaos',
+		img: '/canvas/imgs/chaos.png',
+	}
 </script>
 
 <template>
@@ -27,6 +33,7 @@
 			<Card :title='project_1.title' :link='project_1.link' :img='project_1.img'></Card>
 			<Card :title='project_2.title' :link='project_2.link' :img='project_2.img'></Card>
 			<Card :title='project_3.title' :link='project_3.link' :img='project_3.img'></Card>
+			<Card :title='project_4.title' :link='project_4.link' :img='project_4.img'></Card>
 		</div>
 	</div>
 </template>
