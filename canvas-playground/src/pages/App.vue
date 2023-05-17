@@ -5,5 +5,11 @@
 <script setup lang='ts'>
 </script>
 
+<style>
+canvas {
+	touch-action: none;
+}
+</style>
+
 <style scoped>
 </style>
