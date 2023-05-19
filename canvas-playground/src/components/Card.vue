@@ -1,7 +1,4 @@
 <script setup lang='ts'>
-	//import { ref, onMounted } from 'vue';
-
-	//const props = defineProps({
 	defineProps({
 		title: {
 			type: String,
@@ -43,15 +40,15 @@ a {
 	background-color: #222222;
     box-shadow: #aaaaaa 5px 5px 10px 5px;
 	
-	transition: transform .3s ease-out;
+	transition: transform .2s ease-out;
 
 	margin: 1em;
 }
 .card:hover {
-	transform: translate(0, 0.1em);
+	transform: translate(0, 0.4em);
 }
 .card img {
-	width: 10em;
-	height: 10em;
+	width: 6em;
+	height: 6em;
 }
 </style>

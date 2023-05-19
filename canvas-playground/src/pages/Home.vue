@@ -47,22 +47,29 @@
 	min-width: 100vw;
 
 	display: flex;
-	justify-content: center;
-	align-items: center;
+	justify-content: space-evenly;
 	flex-direction: column;
-	flex-wrap: wrap;
 
 	font-size: 1.5em;
 }
 #background h1 {
 	font-family: Monoton;
 	color: #000000;
-	margin: 0.2em;
+	margin: 1em;
 	text-align: center;
 }
 #card-list {
 	display: flex;
 	justify-content: center;
 	flex-wrap: wrap;
+}
+#background {
+	background:
+		linear-gradient(#fff 0.15em, transparent 0),
+		linear-gradient(45deg, transparent 74px, transparent 75px, #a4a4a4 75px, #a4a4a4 76px, transparent 77px, transparent 109px),
+		linear-gradient(-45deg, transparent 75px, transparent 76px, #a4a4a4 76px, #a4a4a4 77px, transparent 78px, transparent 109px),
+		#fff;
+	background-size: 100% 6px, 109px 109px, 109px 109px;
+	background-position: 0px 0px, 0px 0px, 0px 0px;
 }
 </style>
