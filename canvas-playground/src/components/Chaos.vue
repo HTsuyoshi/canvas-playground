@@ -59,10 +59,6 @@
 	}
 
 	// Essential functions
-	function getRandom(min: number, max: number): number {
-		return Math.floor(Math.random() * (max - min + 1)) + min;
-	}
-
 	onMounted(() => {
 		const canvas = canvasRef.value;
 		if (!canvas) throw new Error('Canvas not found');
