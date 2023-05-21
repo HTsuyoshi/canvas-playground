@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 	import { ref, onMounted } from 'vue';
 
+	// Arguments
 	const props = defineProps({
 		fullscreen: {
 			type: Boolean,
@@ -18,7 +19,49 @@
 		}
 	});
 
+	// Refs
 	const canvasRef = ref<HTMLCanvasElement | null>(null);
+
+	// Constants
+	const colors: string[] = [
+							'#1e1e1e',
+							'#424242',
+							'#666666',
+							'#807f83',
+							'#cbc9cf'
+							];
+	const colorsLength = colors.length;
+	const borderColorIndex = getRandom(0, colorsLength - 1);
+	const borderColorStroke = colors[borderColorIndex];
+	const borderColorFill = colors[(borderColorIndex + 1) % colorsLength];
+	const g = 9.81;
+	let t = 0;
+	const dt = 0.1;
+
+	// Variables
+	let win = {
+		w: 300,
+		w2: 150,
+		h: 400,
+		h2: 200
+	}
+
+	if (props.fullscreen) {
+		win.w = window.innerWidth;
+		win.w2 = window.innerWidth/2;
+		win.h = window.innerHeight;
+		win.h2 = window.innerHeight/2;
+	} else {
+		win.w = props.width;
+		win.w2 = props.width/2;
+		win.h = props.height;
+		win.h2 = props.height/2;
+	}
+
+	// Essential functions
+	function getRandom(min: number, max: number): number {
+		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
 
 	onMounted(() => {
 		const canvas = canvasRef.value;
@@ -27,57 +70,11 @@
 		if (!context) return;
 
 		const ctx = context;
-		let win = {
-			w: 300,
-			w2: 150,
-			h: 400,
-			h2: 200
-		}
-
-		if (props.fullscreen) {
-			window.addEventListener (
-				'resize',
-				function () {
-					win.w = window.innerWidth;
-					win.w2 = window.innerWidth/2;
-					win.h = window.innerHeight;
-					win.h2 = window.innerHeight/2;
-					ctx.canvas.width  = win.w;
-					ctx.canvas.height = win.h;
-				}
-			)
-			win.w = window.innerWidth;
-			win.w2 = window.innerWidth/2;
-			win.h = window.innerHeight;
-			win.h2 = window.innerHeight/2;
-		} else {
-			win.w = props.width;
-			win.w2 = props.width/2;
-			win.h = props.height;
-			win.h2 = props.height/2;
-		}
 
 		canvas.width  = win.w;
 		canvas.height = win.h;
 
-		const colors: string[] = [
-								'#1e1e1e',
-								'#424242',
-								'#666666',
-								'#807f83',
-								'#cbc9cf'
-								];
-		const colorsLength = colors.length;
-		const borderColorIndex = getRandom(0, colorsLength - 1);
-		const borderColorStroke = colors[borderColorIndex];
-		const borderColorFill = colors[(borderColorIndex + 1) % colorsLength];
-
 		canvas.style.background = '#ffffff';
-
-		// Essential functions
-		function getRandom(min: number, max: number): number {
-			return Math.floor(Math.random() * (max - min + 1)) + min;
-		}
 
 		// Draw
 		function border() {
@@ -229,10 +226,22 @@
 			return p;
 		}
 
-		const g = 9.81;
-		let t = 0;
-		const dt = 0.1;
+		// Events
+		if (props.fullscreen) {
+			window.addEventListener (
+				'resize',
+				function () {
+					win.w = window.innerWidth;
+					win.w2 = window.innerWidth/2;
+					win.h = window.innerHeight;
+					win.h2 = window.innerHeight/2;
+					ctx.canvas.width  = win.w;
+					ctx.canvas.height = win.h;
+				}
+			)
+		}
 
+		// Main function
 		const pendulums: Pendulum[] = [];
 		for (let i=0; i<10; i++)
 			pendulums.push(createPendulum(i));
@@ -245,7 +254,7 @@
 			requestAnimationFrame(drawAnimation);
 		}
 
-		drawAnimation();
+		requestAnimationFrame(drawAnimation);
 	});
 </script>
 

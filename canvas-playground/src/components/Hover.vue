@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 	import { ref, onMounted } from 'vue';
 
+	// Arguments
 	const props = defineProps({
 		fullscreen: {
 			type: Boolean,
@@ -18,67 +19,118 @@
 		}
 	});
 
+	// Refs
 	const canvasRef = ref<HTMLCanvasElement | null>(null);
 
+	// Constants
+	const colors: string[] = [
+							'#012030',
+							'#13678a',
+							'#45c4b0',
+							'#9aeba3',
+							'#dafdba'
+							];
+	const colorsLength = colors.length;
+	const borderColorIndex = getRandom(0, colorsLength - 1);
+	const borderColorStroke = colors[borderColorIndex];
+	const borderColorFill = colors[(borderColorIndex + 1) % colorsLength];
+
+	// Variables
+	let win = {
+		w: 300,
+		w2: 150,
+		h: 400,
+		h2: 200
+	}
+	let mouse = {
+		x: - 200,
+		y: - 200
+	}
+	let touch: any[] = [];
+	let ballNum = 50;
+	if (props.fullscreen) {
+		win.w = window.innerWidth;
+		win.w2 = window.innerWidth/2;
+		win.h = window.innerHeight;
+		win.h2 = window.innerHeight/2;
+	} else {
+		win.w = props.width;
+		win.w2 = props.width/2;
+		win.h = props.height;
+		win.h2 = props.height/2;
+	}
+
+	// Essential functions
+	function getRandom(min: number, max: number): number {
+		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+
+	function isMobileDevice() {
+		return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+	}
+
+	function border(ctx: CanvasRenderingContext2D) {
+		const border = 10;
+		const gap = 5;
+		ctx.strokeStyle = borderColorStroke;
+		ctx.fillStyle = borderColorFill;
+
+		ctx.lineWidth = 2;
+		ctx.setLineDash([5, 1, 5]);
+		ctx.beginPath();
+		ctx.moveTo(win.w2, 30);
+		ctx.lineTo(win.w2, (win.h2) - 90);
+		ctx.moveTo(win.w2, (win.h2) + 65);
+		ctx.lineTo(win.w2, win.h - 30);
+		ctx.stroke();
+		ctx.setLineDash([]);
+
+		let offset = border;
+		ctx.lineWidth = 2;
+		ctx.strokeRect(border, border, win.w - 2*offset, win.h - 2*offset);
+
+		offset += gap;
+		ctx.lineWidth = 5;
+		ctx.strokeRect(offset, offset, win.w - 2*offset, win.h - 2*offset);
+
+		offset += gap;
+		ctx.lineWidth = 2;
+		ctx.strokeRect(offset, offset, win.w - 2*offset, win.h - 2*offset);
+
+		ctx.beginPath();
+		const offsetLetter = 3;
+		let title = 'Hover';
+		ctx.font = `100px Bebas Neue`;
+		ctx.fillText(title, (win.w2) - (ctx.measureText(title).width / 2), win.h2);
+		ctx.strokeText(title, (win.w2) - offsetLetter - (ctx.measureText(title).width / 2), (win.h2) - offsetLetter);
+
+		title = '/Htsuyoshi';
+		ctx.font = `50px Bebas Neue`;
+		ctx.fillText(title, (win.w2) - (ctx.measureText(title).width / 2), win.h2 + 50);
+		ctx.strokeText(title, (win.w2) - offsetLetter - (ctx.measureText(title).width / 2), (win.h2) + 50 - offsetLetter);
+
+		title = 'ADD';
+		ctx.font = `30px Bebas Neue`;
+		ctx.fillText(title, (win.w*3/4) - (ctx.measureText(title).width / 2), win.h*1/8 + 50);
+
+		title = 'RM';
+		ctx.font = `30px Bebas Neue`;
+		ctx.fillText(title, (win.w*1/4) - (ctx.measureText(title).width / 2), win.h*1/8 + 50);
+	}
+
 	onMounted(() => {
+		// Setup canvas
 		const canvas = canvasRef.value;
 		if (!canvas) throw new Error('Canvas not found');
 		const context = canvas.getContext('2d');
 		if (!context) return;
 
 		const ctx = context;
-		let win = {
-			w: 300,
-			w2: 150,
-			h: 400,
-			h2: 200
-		}
-		let mouse = {
-			x: - 200,
-			y: - 200
-		}
-		let touch: any[] = [];
-		let ballNum = 50;
-
-		if (props.fullscreen) {
-			window.addEventListener (
-				'resize',
-				function () {
-					win.w = window.innerWidth;
-					win.w2 = window.innerWidth/2;
-					win.h = window.innerHeight;
-					win.h2 = window.innerHeight/2;
-					ctx.canvas.width  = win.w;
-					ctx.canvas.height = win.h;
-				}
-			)
-			win.w = window.innerWidth;
-			win.w2 = window.innerWidth/2;
-			win.h = window.innerHeight;
-			win.h2 = window.innerHeight/2;
-		} else {
-			win.w = props.width;
-			win.w2 = props.width/2;
-			win.h = props.height;
-			win.h2 = props.height/2;
-		}
 
 		canvas.width  = win.w;
 		canvas.height = win.h;
 
 		const rect = canvas.getBoundingClientRect();
-
-		const colors: string[] = [
-								'#012030',
-								'#13678a',
-								'#45c4b0',
-								'#9aeba3',
-								'#dafdba'
-								];
-		const colorsLength = colors.length;
-		const borderColorIndex = getRandom(0, colorsLength - 1);
-		const borderColorStroke = colors[borderColorIndex];
-		const borderColorFill = colors[(borderColorIndex + 1) % colorsLength];
 
 		function createBall(): Circle {
 			let dx = getRandom(-2, 2);
@@ -94,87 +146,7 @@
 			return new Circle(x, y, dx, dy, radius, color);
 		}
 
-		function isMobileDevice() {
-			return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-		}
-
-		// Computer
-		if(!isMobileDevice()) {
-			window.addEventListener (
-				'mousemove',
-				(e) => {
-					mouse.x = e.x;
-					mouse.y = e.y;
-				}
-			)
-		}
-
-		window.addEventListener (
-			'click',
-			(e) => {
-				if (e.clientX > win.w2)
-					for (let i = 0; i < 10; i++)
-						circles.push(createBall());
-				if (e.clientX < win.w2)
-					circles.splice(0, 10);
-			}
-		)
-
-		// Cellphone
-		if(isMobileDevice()) {
-			window.addEventListener (
-				'touchstart',
-				(e) => {
-					for (let t of e.changedTouches) {
-						if (t.clientX > win.w2)
-							for (let i = 0; i < 10; i++)
-								circles.push(createBall());
-						if (t.clientX < win.w2)
-							circles.splice(0, 10);
-						touch.push(t);
-					}
-					ctx.strokeStyle = borderColorStroke;
-					ctx.fillStyle = borderColorFill;
-				}
-			)
-
-			window.addEventListener (
-				'touchmove',
-				(e) => {
-					for (let t of e.changedTouches)
-						for (let i=0; i<touch.length; ++i)
-							if (t.target == touch[i].target)
-								touch[i] = t;
-				}
-			)
-
-			window.addEventListener (
-				'touchend',
-				(e) => {
-				for (let t of e.changedTouches) {
-					const index = touch.findIndex(item => item.target === t.target);
-						if (index !== -1) touch.splice(index, 1);
-					}
-				}
-			)
-
-			window.addEventListener(
-				'touchcancel',
-				(e) => {
-				for (let t of e.changedTouches) {
-					const index = touch.findIndex(item => item.target === t.target);
-						if (index !== -1) touch.splice(index, 1);
-					}
-				}
-			);
-		}
-
 		canvas.style.background = '#ffffff';
-
-		// Essential functions
-		function getRandom(min: number, max: number): number {
-			return Math.floor(Math.random() * (max - min + 1)) + min;
-		}
 
 		// Shapes
 		interface CircleInterface {
@@ -261,53 +233,96 @@
 			}
 		}
 
-		function border() {
-			const border = 10;
-			const gap = 5;
-			ctx.strokeStyle = borderColorStroke;
-			ctx.fillStyle = borderColorFill;
+		// Events
+		if (props.fullscreen) {
+			window.addEventListener (
+				'resize',
+				function () {
+					win.w = window.innerWidth;
+					win.w2 = window.innerWidth/2;
+					win.h = window.innerHeight;
+					win.h2 = window.innerHeight/2;
+					ctx.canvas.width  = win.w;
+					ctx.canvas.height = win.h;
+				}
+			)
+		}
 
-			ctx.lineWidth = 2;
-			ctx.setLineDash([5, 1, 5]);
-			ctx.beginPath();
-			ctx.moveTo(win.w2, 30);
-			ctx.lineTo(win.w2, (win.h2) - 90);
-			ctx.moveTo(win.w2, (win.h2) + 65);
-			ctx.lineTo(win.w2, win.h - 30);
-			ctx.stroke();
-			ctx.setLineDash([]);
+		// Computer
+		if(!isMobileDevice()) {
+			window.addEventListener (
+				'mousemove',
+				(e) => {
+					mouse.x = e.x;
+					mouse.y = e.y;
+				}
+			)
+		}
 
-			let offset = border;
-			ctx.lineWidth = 2;
-			ctx.strokeRect(border, border, win.w - 2*offset, win.h - 2*offset);
+		window.addEventListener (
+			'click',
+			(e) => {
+				if (e.clientX > win.w2)
+					for (let i = 0; i < 10; i++)
+						circles.push(createBall());
+				if (e.clientX < win.w2)
+					circles.splice(0, 10);
+			}
+		)
 
-			offset += gap;
-			ctx.lineWidth = 5;
-			ctx.strokeRect(offset, offset, win.w - 2*offset, win.h - 2*offset);
+		// Cellphone
+		if(isMobileDevice()) {
+			window.addEventListener (
+				'touchstart',
+				(e) => {
+					for (let t of e.changedTouches) {
+						if (t.clientX > win.w2)
+							for (let i = 0; i < 10; i++)
+								circles.push(createBall());
+						if (t.clientX < win.w2)
+							circles.splice(0, 10);
+						touch.push(t);
+					}
+					ctx.strokeStyle = borderColorStroke;
+					ctx.fillStyle = borderColorFill;
+				}
+			)
 
-			offset += gap;
-			ctx.lineWidth = 2;
-			ctx.strokeRect(offset, offset, win.w - 2*offset, win.h - 2*offset);
+			window.addEventListener (
+				'touchmove',
+				(e) => {
+					for (let t of e.changedTouches)
+						for (let i=0; i<touch.length; ++i)
+							if (t.target == touch[i].target)
+								touch[i] = t;
+				}
+			)
 
-			ctx.beginPath();
-			const offsetLetter = 3;
-			let title = 'Hover';
-			ctx.font = `100px Bebas Neue`;
-			ctx.fillText(title, (win.w2) - (ctx.measureText(title).width / 2), win.h2);
-			ctx.strokeText(title, (win.w2) - offsetLetter - (ctx.measureText(title).width / 2), (win.h2) - offsetLetter);
+			window.addEventListener (
+				'touchend',
+				(e) => {
+				for (let t of e.changedTouches) {
+					const index = touch.findIndex(item => item.target === t.target);
+						if (index !== -1) touch.splice(index, 1);
+					}
+				}
+			)
 
-			title = '/Htsuyoshi';
-			ctx.font = `50px Bebas Neue`;
-			ctx.fillText(title, (win.w2) - (ctx.measureText(title).width / 2), win.h2 + 50);
-			ctx.strokeText(title, (win.w2) - offsetLetter - (ctx.measureText(title).width / 2), (win.h2) + 50 - offsetLetter);
+			window.addEventListener(
+				'touchcancel',
+				(e) => {
+				for (let t of e.changedTouches) {
+					const index = touch.findIndex(item => item.target === t.target);
+						if (index !== -1) touch.splice(index, 1);
+					}
+				}
+			);
+		}
 
-			title = 'ADD';
-			ctx.font = `30px Bebas Neue`;
-			ctx.fillText(title, (win.w*3/4) - (ctx.measureText(title).width / 2), win.h*1/8 + 50);
-
-			title = 'RM';
-			ctx.font = `30px Bebas Neue`;
-			ctx.fillText(title, (win.w*1/4) - (ctx.measureText(title).width / 2), win.h*1/8 + 50);
+		// Main function
+		let circles: Array<Circle> = [];
+		for (let i = 0; i < ballNum; i++) {
+			circles.push(createBall());
 		}
 
 		function drawAnimation(): void {
@@ -315,16 +330,11 @@
 			for (let c of circles) {
 				c.update();
 			}
-			border();
+			border(ctx);
 			requestAnimationFrame(drawAnimation);
 		}
 
-		let circles: Array<Circle> = [];
-		for (let i = 0; i < ballNum; i++) {
-			circles.push(createBall());
-		}
-
-		drawAnimation();
+		requestAnimationFrame(drawAnimation);
 	});
 </script>
 
