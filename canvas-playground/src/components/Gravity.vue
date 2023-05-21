@@ -31,7 +31,7 @@
 							'#e5006a'
 							];
 	const colorsLength = colors.length;
-	const borderColorIndex = getRandom(0, colorsLength - 1);
+	const borderColorIndex = 1;
 	const borderColorStroke = colors[borderColorIndex];
 	const borderColorFill = colors[(borderColorIndex + 1) % colorsLength];
 
