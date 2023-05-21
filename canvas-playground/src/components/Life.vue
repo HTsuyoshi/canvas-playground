@@ -37,6 +37,7 @@
 
 	// Variables
 	let updateGame = true;
+	let invertCell = false;
 	let win = {
 		w: 300,
 		w2: 150,
@@ -92,6 +93,28 @@
 		ctx.font = `50px Bebas Neue`;
 		ctx.fillText(title, (win.w2) - (ctx.measureText(title).width / 2), 170);
 		ctx.strokeText(title, (win.w2) - offsetLetter - (ctx.measureText(title).width / 2), 170 - offsetLetter);
+
+		if(!isMobileDevice()) {
+			title = 'Left click';
+			ctx.font = `60px Bebas Neue`;
+			ctx.fillText(title, (win.w2/2) - (ctx.measureText(title).width / 2), win.h2);
+			ctx.strokeText(title, (win.w2/2) - offsetLetter - (ctx.measureText(title).width / 2), win.h2 - offsetLetter);
+
+			title = 'Pause/Start';
+			ctx.font = `30px Bebas Neue`;
+			ctx.fillText(title, (win.w2/2) - (ctx.measureText(title).width / 2), win.h2 + 50);
+			ctx.strokeText(title, (win.w2/2) - offsetLetter - (ctx.measureText(title).width / 2), win.h2 + 50 - offsetLetter);
+
+			title = 'Right click';
+			ctx.font = `60px Bebas Neue`;
+			ctx.fillText(title, (win.w2*3/2) - (ctx.measureText(title).width / 2), win.h2);
+			ctx.strokeText(title, (win.w2*3/2) - offsetLetter - (ctx.measureText(title).width / 2), win.h2 - offsetLetter);
+
+			title = 'Invert';
+			ctx.font = `30px Bebas Neue`;
+			ctx.fillText(title, (win.w2*3/2) - (ctx.measureText(title).width / 2), win.h2 + 50);
+			ctx.strokeText(title, (win.w2*3/2) - offsetLetter - (ctx.measureText(title).width / 2), win.h2 + 50 - offsetLetter);
+		}
 	}
 
 	onMounted(() => {
@@ -244,7 +267,11 @@
 			window.addEventListener (
 				'mousemove',
 				(e) => {
-					game.mouseAdd(e.clientX, e.clientY);
+					if (invertCell) {
+						game.mouseRemove(e.clientX, e.clientY);
+					} else {
+						game.mouseAdd(e.clientX, e.clientY);
+					}
 				}
 			)
 			window.addEventListener (
@@ -257,7 +284,7 @@
 				'contextmenu',
 				(e) => {
 					e.preventDefault();
-					game.mouseRemove(e.clientX, e.clientY);
+					invertCell = !invertCell;
 				}
 			);
 		} else {
@@ -305,7 +332,6 @@
 
 		let t = 0;
 		let delay = 1000 / 24;
-
 		if(isMobileDevice()) {
 			delay = 1000 / 18;
 		}
