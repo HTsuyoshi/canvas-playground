@@ -36,6 +36,7 @@
 	const borderColorFill = colors[(borderColorIndex + 1) % colorsLength];
 
 	// Variables
+	let updateGame = true;
 	let win = {
 		w: 300,
 		w2: 150,
@@ -240,6 +241,12 @@
 					game.mouseAdd(e.clientX, e.clientY);
 				}
 			)
+			window.addEventListener (
+				'click',
+				() => {
+					updateGame = !updateGame;
+				}
+			)
 		} else {
 			window.addEventListener (
 				'touchstart',
@@ -297,7 +304,8 @@
 			border(ctx);
 			if (dt >= delay) {
 				t = timestamp;
-				game.update();
+				if (updateGame)
+					game.update();
 			}
 			requestAnimationFrame(drawAnimation);
 		}
