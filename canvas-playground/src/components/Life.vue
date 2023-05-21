@@ -166,6 +166,12 @@
 				this.addCell(Math.floor(x/this.size), Math.floor(y/this.size));
 			}
 
+			public mouseRemove(x: number, y: number): void {
+				const key = [Math.floor(x/this.size), Math.floor(y/this.size)].toString();
+				if (this.alive.has(key))
+					this.alive.delete(key);
+			}
+
 			public addCell(x: number, y: number): void {
 				if (x < 0 && x >= this.cols
 					&& y < 0 && y >= this.rows) {
@@ -247,6 +253,13 @@
 					updateGame = !updateGame;
 				}
 			)
+			window.addEventListener(
+				'contextmenu',
+				(e) => {
+					e.preventDefault();
+					game.mouseRemove(e.clientX, e.clientY);
+				}
+			);
 		} else {
 			window.addEventListener (
 				'touchstart',
