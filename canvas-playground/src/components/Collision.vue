@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 	import { ref, onMounted } from 'vue';
 	import { getRandom, isMobileDevice } from '../lib/generic.ts';
-	import { border, buttons } from '../lib/draw.ts';
+	import { border, buttons, draw_circle } from '../lib/draw.ts';
 	import { getDistance, getDirection } from '../lib/physics.ts';
 
 	// Arguments
@@ -57,7 +57,8 @@
 		r: 50,
 		elasticity: 1.0
 	}
-	let ballNum = 20;
+	let ballNum: number = 20;
+	let debug: boolean = false;
 
 	if (props.fullscreen) {
 		win.w = window.innerWidth;
@@ -184,14 +185,7 @@
 			}
 
 			draw(): void {
-				ctx.beginPath();
-				ctx.arc(this.pos.x, this.pos.y, this.r, 0, Math.PI * 2);
-				ctx.fillStyle = this.color;
-				ctx.fill();
-				ctx.strokeStyle = borderColorStroke;
-				ctx.moveTo(this.pos.x, this.pos.y);
-				ctx.lineTo(this.pos.x + this.vel.dx*3, this.pos.y + this.vel.dy*3);
-				ctx.stroke();
+				draw_circle(ctx, this.pos.x, this.pos.y, this.vel.dx, this.vel.dy, this.r, true, debug, this.color, borderColorStroke)
 			}
 
 			move(): void {
@@ -246,6 +240,14 @@
 					ctx.fillStyle = borderColorFill;
 				}
 			)
+			window .addEventListener(
+				'keydown',
+				(e) => {
+					if (e.isComposing || e.keyCode === 27) {
+						debug = !debug;
+					}
+				}
+			);
 		} else {
 			window.addEventListener (
 				'touchstart',

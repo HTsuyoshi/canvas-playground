@@ -82,3 +82,46 @@ export function life_buttons(ctx: CanvasRenderingContext2D,
 	ctx.fillText(title, (win.w2*3/2) - (ctx.measureText(title).width / 2), win.h2 + 50);
 	ctx.strokeText(title, (win.w2*3/2) - offset_letter - (ctx.measureText(title).width / 2), win.h2 + 50 - offset_letter);
 }
+
+export function draw_circle(ctx: CanvasRenderingContext2D,
+							x: number, y: number,
+							dx: number, dy: number,
+							r: number,
+							vel: boolean, debug: boolean,
+							c: string, border_c: string) {
+	ctx.beginPath();
+	ctx.arc(x, y, r, 0, Math.PI * 2);
+	ctx.fillStyle = c;
+	ctx.fill();
+
+	ctx.strokeStyle = border_c;
+	if (vel) {
+		ctx.moveTo(x, y);
+		ctx.lineTo(x + dx*3, y + dy*3);
+	}
+
+	if(debug) {
+		ctx.moveTo(x - r, y - r*2);
+		ctx.lineTo(x - r*2, y - r*2);
+		ctx.lineTo(x - r*2, y - r);
+
+		ctx.moveTo(x + r, y - r*2);
+		ctx.lineTo(x + r*2, y - r*2);
+		ctx.lineTo(x + r*2, y - r);
+
+		ctx.moveTo(x - r, y + r*2);
+		ctx.lineTo(x - r*2, y + r*2);
+		ctx.lineTo(x - r*2, y + r);
+
+		ctx.moveTo(x + r, y + r*2);
+		ctx.lineTo(x + r*2, y + r*2);
+		ctx.lineTo(x + r*2, y + r);
+	}
+	ctx.stroke();
+
+	if(debug) {
+		let pos = `(${x.toFixed(2)}, ${y.toFixed(2)})`;
+		ctx.font = `25px Bebas Neue`;
+		ctx.fillText(pos, x - ctx.measureText(pos).width/2, y - r*1.3);
+	}
+}

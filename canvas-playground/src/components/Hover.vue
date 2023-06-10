@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 	import { ref, onMounted } from 'vue';
 	import { getRandom, isMobileDevice } from '../lib/generic.ts';
-	import { border, buttons } from '../lib/draw.ts';
+	import { border, buttons, draw_circle } from '../lib/draw.ts';
 
 	// Arguments
 	const props = defineProps({
@@ -55,7 +55,8 @@
 		y: - 200
 	}
 	let touch: any[] = [];
-	let ballNum = 50;
+	let ballNum: number = 50;
+	let debug: boolean = false;
 
 	onMounted(() => {
 		// Setup canvas
@@ -120,10 +121,7 @@
 			}
 
 			draw(): void {
-				ctx.beginPath();
-				ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-				ctx.fillStyle = this.color;
-				ctx.fill();
+				draw_circle(ctx, this.x, this.y, this.dx, this.dy, this.r, false, debug, this.color, borderColorStroke)
 			}
 
 			move(): void {
@@ -208,6 +206,15 @@
 					circles.splice(0, 10);
 			}
 		)
+
+		window .addEventListener(
+			'keydown',
+			(e) => {
+				if (e.isComposing || e.keyCode === 27) {
+					debug = !debug;
+				}
+			}
+		);
 
 		// Cellphone
 		if(isMobileDevice()) {
