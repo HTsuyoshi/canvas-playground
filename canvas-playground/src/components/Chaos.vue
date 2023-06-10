@@ -1,5 +1,6 @@
 <script setup lang='ts'>
 	import { ref, onMounted } from 'vue';
+	import { border } from '../lib/draw.ts';
 
 	// Arguments
 	const props = defineProps({
@@ -40,10 +41,10 @@
 
 	// Variables
 	let win = {
-		w: 300,
-		w2: 150,
-		h: 400,
-		h2: 200
+		w:  props.width,
+		w2: props.width/2,
+		h:  props.height,
+		h2: props.height/2
 	}
 
 	if (props.fullscreen) {
@@ -51,11 +52,6 @@
 		win.w2 = window.innerWidth/2;
 		win.h = window.innerHeight;
 		win.h2 = window.innerHeight/2;
-	} else {
-		win.w = props.width;
-		win.w2 = props.width/2;
-		win.h = props.height;
-		win.h2 = props.height/2;
 	}
 
 	// Essential functions
@@ -71,37 +67,6 @@
 		canvas.height = win.h;
 
 		canvas.style.background = '#ffffff';
-
-		// Draw
-		function border() {
-			const border = 10;
-			const gap = 5;
-			ctx.strokeStyle = borderColorStroke;
-			ctx.fillStyle = borderColorFill;
-
-			let offset = border;
-			ctx.lineWidth = 2;
-			ctx.strokeRect(border, border, win.w - 2*offset, win.h - 2*offset);
-
-			offset += gap;
-			ctx.lineWidth = 5;
-			ctx.strokeRect(offset, offset, win.w - 2*offset, win.h - 2*offset);
-
-			offset += gap;
-			ctx.lineWidth = 2;
-			ctx.strokeRect(offset, offset, win.w - 2*offset, win.h - 2*offset);
-
-			const offsetLetter = 3;
-			let title = 'Chaos';
-			ctx.font = `100px Bebas Neue`;
-			ctx.fillText(title, (win.w2) - (ctx.measureText(title).width / 2), win.h2*3/4);
-			ctx.strokeText(title, (win.w2) - offsetLetter - (ctx.measureText(title).width / 2), (win.h2*3/4) - offsetLetter);
-
-			title = '/Htsuyoshi';
-			ctx.font = `50px Bebas Neue`;
-			ctx.fillText(title, (win.w2) - (ctx.measureText(title).width / 2), (win.h2*3/4) + 50);
-			ctx.strokeText(title, (win.w2) - offsetLetter - (ctx.measureText(title).width / 2), (win.h2*3/4) + 50 - offsetLetter);
-		}
 
 		class Pendulum {
 			x1: number;
@@ -244,7 +209,9 @@
 
 		function drawAnimation(): void {
 			ctx.clearRect(0, 0, win.w, win.h);
-			border();
+			ctx.strokeStyle = borderColorStroke;
+			ctx.fillStyle = borderColorFill;
+			border(ctx, 'Chaos', win, { x: 0, y: -200 });
 			for (let p of pendulums)
 				p.update();
 			requestAnimationFrame(drawAnimation);

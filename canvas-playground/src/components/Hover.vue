@@ -1,5 +1,7 @@
 <script setup lang='ts'>
 	import { ref, onMounted } from 'vue';
+	import { getRandom, isMobileDevice } from '../lib/generic.ts';
+	import { border, buttons } from '../lib/draw.ts';
 
 	// Arguments
 	const props = defineProps({
@@ -37,10 +39,16 @@
 
 	// Variables
 	let win = {
-		w: 300,
-		w2: 150,
-		h: 400,
-		h2: 200
+		w: props.width,
+		w2: props.width/2,
+		h: props.height,
+		h2: props.height/2
+	}
+	if (props.fullscreen) {
+		win.w = window.innerWidth;
+		win.w2 = window.innerWidth/2;
+		win.h = window.innerHeight;
+		win.h2 = window.innerHeight/2;
 	}
 	let mouse = {
 		x: - 200,
@@ -48,75 +56,6 @@
 	}
 	let touch: any[] = [];
 	let ballNum = 50;
-	if (props.fullscreen) {
-		win.w = window.innerWidth;
-		win.w2 = window.innerWidth/2;
-		win.h = window.innerHeight;
-		win.h2 = window.innerHeight/2;
-	} else {
-		win.w = props.width;
-		win.w2 = props.width/2;
-		win.h = props.height;
-		win.h2 = props.height/2;
-	}
-
-	// Essential functions
-	function getRandom(min: number, max: number): number {
-		return Math.floor(Math.random() * (max - min + 1)) + min;
-	}
-
-	function isMobileDevice() {
-		return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-	}
-
-	function border(ctx: CanvasRenderingContext2D) {
-		const border = 10;
-		const gap = 5;
-		ctx.strokeStyle = borderColorStroke;
-		ctx.fillStyle = borderColorFill;
-
-		ctx.lineWidth = 2;
-		ctx.setLineDash([5, 1, 5]);
-		ctx.beginPath();
-		ctx.moveTo(win.w2, 30);
-		ctx.lineTo(win.w2, (win.h2) - 90);
-		ctx.moveTo(win.w2, (win.h2) + 65);
-		ctx.lineTo(win.w2, win.h - 30);
-		ctx.stroke();
-		ctx.setLineDash([]);
-
-		let offset = border;
-		ctx.lineWidth = 2;
-		ctx.strokeRect(border, border, win.w - 2*offset, win.h - 2*offset);
-
-		offset += gap;
-		ctx.lineWidth = 5;
-		ctx.strokeRect(offset, offset, win.w - 2*offset, win.h - 2*offset);
-
-		offset += gap;
-		ctx.lineWidth = 2;
-		ctx.strokeRect(offset, offset, win.w - 2*offset, win.h - 2*offset);
-
-		ctx.beginPath();
-		const offsetLetter = 3;
-		let title = 'Hover';
-		ctx.font = `100px Bebas Neue`;
-		ctx.fillText(title, (win.w2) - (ctx.measureText(title).width / 2), win.h2);
-		ctx.strokeText(title, (win.w2) - offsetLetter - (ctx.measureText(title).width / 2), (win.h2) - offsetLetter);
-
-		title = '/Htsuyoshi';
-		ctx.font = `50px Bebas Neue`;
-		ctx.fillText(title, (win.w2) - (ctx.measureText(title).width / 2), win.h2 + 50);
-		ctx.strokeText(title, (win.w2) - offsetLetter - (ctx.measureText(title).width / 2), (win.h2) + 50 - offsetLetter);
-
-		title = 'ADD';
-		ctx.font = `30px Bebas Neue`;
-		ctx.fillText(title, (win.w*3/4) - (ctx.measureText(title).width / 2), win.h*1/8 + 50);
-
-		title = 'RM';
-		ctx.font = `30px Bebas Neue`;
-		ctx.fillText(title, (win.w*1/4) - (ctx.measureText(title).width / 2), win.h*1/8 + 50);
-	}
 
 	onMounted(() => {
 		// Setup canvas
@@ -330,7 +269,10 @@
 			for (let c of circles) {
 				c.update();
 			}
-			border(ctx);
+			ctx.fillStyle = borderColorFill;
+			ctx.strokeStyle = borderColorStroke;
+			border(ctx, 'Hover', win);
+			buttons(ctx, win)
 			requestAnimationFrame(drawAnimation);
 		}
 

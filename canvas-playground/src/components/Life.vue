@@ -1,5 +1,7 @@
 <script setup lang='ts'>
 	import { ref, onMounted } from 'vue';
+	import { isMobileDevice } from '../lib/generic.ts'
+	import { border, life_buttons } from '../lib/draw.ts'
 
 	// Arguments
 	const props = defineProps({
@@ -32,85 +34,22 @@
 							];
 	const colorsLength = colors.length;
 	const borderColorIndex = 0;
-	const borderColorStroke = colors[borderColorIndex];
 	const borderColorFill = colors[(borderColorIndex + 1) % colorsLength];
 
 	// Variables
 	let updateGame = true;
 	let invertCell = false;
 	let win = {
-		w: 300,
-		w2: 150,
-		h: 400,
-		h2: 200
+		w: props.width,
+		w2: props.width/2,
+		h: props.height,
+		h2: props.height/2
 	}
 	if (props.fullscreen) {
 		win.w = window.innerWidth;
 		win.w2 = window.innerWidth/2;
 		win.h = window.innerHeight;
 		win.h2 = window.innerHeight/2;
-	} else {
-		win.w = props.width;
-		win.w2 = props.width/2;
-		win.h = props.height;
-		win.h2 = props.height/2;
-	}
-
-	// Essential functions
-	function isMobileDevice() {
-		return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-	}
-
-	function border(ctx: CanvasRenderingContext2D) {
-		const border = 10;
-		const gap = 5;
-		ctx.strokeStyle = borderColorStroke;
-		ctx.fillStyle = borderColorFill;
-
-		let offset = border;
-		ctx.lineWidth = 2;
-		ctx.strokeRect(border, border, win.w - 2*offset, win.h - 2*offset);
-
-		offset += gap;
-		ctx.lineWidth = 5;
-		ctx.strokeRect(offset, offset, win.w - 2*offset, win.h - 2*offset);
-
-		offset += gap;
-		ctx.lineWidth = 2;
-		ctx.strokeRect(offset, offset, win.w - 2*offset, win.h - 2*offset);
-
-		const offsetLetter = 3;
-		let title = 'Life';
-		ctx.font = `100px Bebas Neue`;
-		ctx.fillText(title, (win.w2) - (ctx.measureText(title).width / 2), 120);
-		ctx.strokeText(title, (win.w2) - offsetLetter - (ctx.measureText(title).width / 2), 120 - offsetLetter);
-
-		title = '/Htsuyoshi';
-		ctx.font = `50px Bebas Neue`;
-		ctx.fillText(title, (win.w2) - (ctx.measureText(title).width / 2), 170);
-		ctx.strokeText(title, (win.w2) - offsetLetter - (ctx.measureText(title).width / 2), 170 - offsetLetter);
-
-		if(!isMobileDevice()) {
-			title = 'Left click';
-			ctx.font = `60px Bebas Neue`;
-			ctx.fillText(title, (win.w2/2) - (ctx.measureText(title).width / 2), win.h2);
-			ctx.strokeText(title, (win.w2/2) - offsetLetter - (ctx.measureText(title).width / 2), win.h2 - offsetLetter);
-
-			title = 'Pause/Start';
-			ctx.font = `30px Bebas Neue`;
-			ctx.fillText(title, (win.w2/2) - (ctx.measureText(title).width / 2), win.h2 + 50);
-			ctx.strokeText(title, (win.w2/2) - offsetLetter - (ctx.measureText(title).width / 2), win.h2 + 50 - offsetLetter);
-
-			title = 'Right click';
-			ctx.font = `60px Bebas Neue`;
-			ctx.fillText(title, (win.w2*3/2) - (ctx.measureText(title).width / 2), win.h2);
-			ctx.strokeText(title, (win.w2*3/2) - offsetLetter - (ctx.measureText(title).width / 2), win.h2 - offsetLetter);
-
-			title = 'Invert';
-			ctx.font = `30px Bebas Neue`;
-			ctx.fillText(title, (win.w2*3/2) - (ctx.measureText(title).width / 2), win.h2 + 50);
-			ctx.strokeText(title, (win.w2*3/2) - offsetLetter - (ctx.measureText(title).width / 2), win.h2 + 50 - offsetLetter);
-		}
 	}
 
 	onMounted(() => {
@@ -336,7 +275,9 @@
 			const dt = timestamp - t;
 			ctx.clearRect(0, 0, win.w, win.h);
 			game.draw();
-			border(ctx);
+			border(ctx, 'Life', win, { x: 0, y: -200 });
+			if (!isMobileDevice())
+				life_buttons(ctx, win);
 			if (dt >= delay) {
 				t = timestamp;
 				if (updateGame)

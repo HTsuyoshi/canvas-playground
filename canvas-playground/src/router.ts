@@ -8,8 +8,7 @@ import Life from './pages/Life.vue'
 
 const router = createRouter({
 	history: createWebHistory(),
-	routes: [
-		{
+	routes: [ {
 			path: '/canvas',
 			name: 'CanvasHome',
 			component: Home
@@ -38,7 +37,7 @@ const router = createRouter({
 			path: '/canvas/life',
 			name: 'Life',
 			component: Life
-		},
+		}
 	]
 })
 
