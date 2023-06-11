@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 	import { ref, onMounted } from 'vue';
 	import { getRandom, isMobileDevice } from '../lib/generic.ts';
-	import { border, buttons, draw_circle } from '../lib/draw.ts';
+	import { border, buttons, draw_circle, drawing_styles } from '../lib/draw.ts';
 
 	// Arguments
 	const props = defineProps({
@@ -49,7 +49,7 @@
 		y: 0
 	}
 	let ballNum: number = 50;
-	let debug: boolean = false;
+	let debug: number = 1;
 	var gravity = 0.5;
 	var gravityDirection = {
 		x: 0,
@@ -128,7 +128,7 @@
 			}
 
 			draw(): void {
-				draw_circle(ctx, this.x, this.y, this.dx, this.dy, this.r, true, debug, this.color, borderColorStroke)
+				draw_circle(ctx, this.x, this.y, this.dx, this.dy, this.r, debug, this.color, borderColorStroke)
 			}
 
 			move(): void {
@@ -200,7 +200,7 @@
 			'keydown',
 			(e) => {
 				if (e.isComposing || e.keyCode === 27) {
-					debug = !debug;
+					debug = (debug + 1) % drawing_styles;
 				}
 			}
 		);
@@ -264,8 +264,8 @@
 			}
 			ctx.fillStyle = borderColorFill;
 			ctx.strokeStyle = borderColorStroke;
-			border(ctx, 'Gravity', win);
-			buttons(ctx, win)
+			border(ctx, 'Gravity');
+			buttons(ctx)
 			requestAnimationFrame(drawAnimation);
 		}
 

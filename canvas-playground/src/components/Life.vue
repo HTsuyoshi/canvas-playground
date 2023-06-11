@@ -275,9 +275,9 @@
 			const dt = timestamp - t;
 			ctx.clearRect(0, 0, win.w, win.h);
 			game.draw();
-			border(ctx, 'Life', win, { x: 0, y: -200 });
+			border(ctx, 'Life', { x: 0, y: -200 });
 			if (!isMobileDevice())
-				life_buttons(ctx, win);
+				life_buttons(ctx);
 			if (dt >= delay) {
 				t = timestamp;
 				if (updateGame)

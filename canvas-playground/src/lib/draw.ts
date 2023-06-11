@@ -1,6 +1,11 @@
 export function border(ctx: CanvasRenderingContext2D, title: string,
-						win: { w: number, w2: number, h: number, h2: number},
 						offset_title = { x: 0, y: 0}) {
+	const win = {
+		w: ctx.canvas.clientWidth,
+		w2: ctx.canvas.clientWidth/2,
+		h: ctx.canvas.clientHeight,
+		h2: ctx.canvas.clientHeight/2,
+	}
 	const border = 10;
 	const gap = 5;
 
@@ -28,8 +33,13 @@ export function border(ctx: CanvasRenderingContext2D, title: string,
 	ctx.strokeText(title, (win.w2) - offset_letter - (ctx.measureText(title).width / 2) + offset_title.x, (win.h2) + 50 - offset_letter + offset_title.y);
 }
 
-export function buttons(ctx: CanvasRenderingContext2D,
-						win: { w: number, w2: number, h: number, h2: number}) {
+export function buttons(ctx: CanvasRenderingContext2D) {
+	const win = {
+		w: ctx.canvas.clientWidth,
+		w2: ctx.canvas.clientWidth/2,
+		h: ctx.canvas.clientHeight,
+		h2: ctx.canvas.clientHeight/2,
+	}
 	ctx.lineWidth = 2;
 	ctx.setLineDash([5, 1, 5]);
 	ctx.beginPath();
@@ -49,8 +59,13 @@ export function buttons(ctx: CanvasRenderingContext2D,
 	ctx.fillText(title, (win.w*1/4) - (ctx.measureText(title).width / 2), win.h*1/8 + 50);
 }
 
-export function life_buttons(ctx: CanvasRenderingContext2D,
-						win: { w: number, w2: number, h: number, h2: number}) {
+export function life_buttons(ctx: CanvasRenderingContext2D) {
+	const win = {
+		w: ctx.canvas.clientWidth,
+		w2: ctx.canvas.clientWidth/2,
+		h: ctx.canvas.clientHeight,
+		h2: ctx.canvas.clientHeight/2,
+	}
 	ctx.lineWidth = 2;
 	ctx.setLineDash([5, 1, 5]);
 	ctx.beginPath();
@@ -83,11 +98,12 @@ export function life_buttons(ctx: CanvasRenderingContext2D,
 	ctx.strokeText(title, (win.w2*3/2) - offset_letter - (ctx.measureText(title).width / 2), win.h2 + 50 - offset_letter);
 }
 
+export const drawing_styles = 5;
+
 export function draw_circle(ctx: CanvasRenderingContext2D,
 							x: number, y: number,
 							dx: number, dy: number,
-							r: number,
-							vel: boolean, debug: boolean,
+							r: number, debug: number,
 							c: string, border_c: string) {
 	ctx.beginPath();
 	ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -95,12 +111,12 @@ export function draw_circle(ctx: CanvasRenderingContext2D,
 	ctx.fill();
 
 	ctx.strokeStyle = border_c;
-	if (vel) {
+	if (debug >= 1) {
 		ctx.moveTo(x, y);
 		ctx.lineTo(x + dx*3, y + dy*3);
 	}
 
-	if(debug) {
+	if(debug >= 2) {
 		ctx.moveTo(x - r, y - r*2);
 		ctx.lineTo(x - r*2, y - r*2);
 		ctx.lineTo(x - r*2, y - r);
@@ -117,11 +133,18 @@ export function draw_circle(ctx: CanvasRenderingContext2D,
 		ctx.lineTo(x + r*2, y + r*2);
 		ctx.lineTo(x + r*2, y + r);
 	}
-	ctx.stroke();
 
-	if(debug) {
+	if(debug >= 3) {
 		let pos = `(${x.toFixed(2)}, ${y.toFixed(2)})`;
 		ctx.font = `25px Bebas Neue`;
 		ctx.fillText(pos, x - ctx.measureText(pos).width/2, y - r*1.3);
 	}
+
+	if(debug >= 4) {
+		ctx.moveTo(0, y);
+		ctx.lineTo(ctx.canvas.clientWidth, y);
+		ctx.moveTo(x, 0);
+		ctx.lineTo(x, ctx.canvas.clientHeight);
+	}
+	ctx.stroke();
 }

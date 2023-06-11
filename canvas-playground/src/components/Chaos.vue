@@ -211,7 +211,7 @@
 			ctx.clearRect(0, 0, win.w, win.h);
 			ctx.strokeStyle = borderColorStroke;
 			ctx.fillStyle = borderColorFill;
-			border(ctx, 'Chaos', win, { x: 0, y: -200 });
+			border(ctx, 'Chaos', { x: 0, y: -200 });
 			for (let p of pendulums)
 				p.update();
 			requestAnimationFrame(drawAnimation);

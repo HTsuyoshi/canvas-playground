@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 	import { ref, onMounted } from 'vue';
 	import { getRandom, isMobileDevice } from '../lib/generic.ts';
-	import { border, buttons, draw_circle } from '../lib/draw.ts';
+	import { border, buttons, draw_circle, drawing_styles } from '../lib/draw.ts';
 	import { getDistance, getDirection } from '../lib/physics.ts';
 
 	// Arguments
@@ -58,7 +58,7 @@
 		elasticity: 1.0
 	}
 	let ballNum: number = 20;
-	let debug: boolean = false;
+	let debug: number = 1;
 
 	if (props.fullscreen) {
 		win.w = window.innerWidth;
@@ -185,7 +185,7 @@
 			}
 
 			draw(): void {
-				draw_circle(ctx, this.pos.x, this.pos.y, this.vel.dx, this.vel.dy, this.r, true, debug, this.color, borderColorStroke)
+				draw_circle(ctx, this.pos.x, this.pos.y, this.vel.dx, this.vel.dy, this.r, debug, this.color, borderColorStroke)
 			}
 
 			move(): void {
@@ -244,7 +244,7 @@
 				'keydown',
 				(e) => {
 					if (e.isComposing || e.keyCode === 27) {
-						debug = !debug;
+						debug = (debug + 1) % drawing_styles;
 					}
 				}
 			);
@@ -332,9 +332,9 @@
 			collision();
 			ctx.fillStyle = borderColorFill;
 			ctx.strokeStyle = borderColorStroke;
-			border(ctx, 'Collision', win);
+			border(ctx, 'Collision');
 			if (!isMobileDevice())
-				buttons(ctx, win)
+				buttons(ctx);
 			requestAnimationFrame(drawAnimation);
 		}
 

@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 	import { ref, onMounted } from 'vue';
 	import { getRandom, isMobileDevice } from '../lib/generic.ts';
-	import { border, buttons, draw_circle } from '../lib/draw.ts';
+	import { border, buttons, draw_circle, drawing_styles } from '../lib/draw.ts';
 
 	// Arguments
 	const props = defineProps({
@@ -56,7 +56,7 @@
 	}
 	let touch: any[] = [];
 	let ballNum: number = 50;
-	let debug: boolean = false;
+	let debug: number = 0;
 
 	onMounted(() => {
 		// Setup canvas
@@ -121,7 +121,7 @@
 			}
 
 			draw(): void {
-				draw_circle(ctx, this.x, this.y, this.dx, this.dy, this.r, false, debug, this.color, borderColorStroke)
+				draw_circle(ctx, this.x, this.y, this.dx, this.dy, this.r, debug, this.color, borderColorStroke)
 			}
 
 			move(): void {
@@ -211,7 +211,7 @@
 			'keydown',
 			(e) => {
 				if (e.isComposing || e.keyCode === 27) {
-					debug = !debug;
+					debug = (debug + 1) % drawing_styles;
 				}
 			}
 		);
@@ -278,8 +278,8 @@
 			}
 			ctx.fillStyle = borderColorFill;
 			ctx.strokeStyle = borderColorStroke;
-			border(ctx, 'Hover', win);
-			buttons(ctx, win)
+			border(ctx, 'Hover');
+			buttons(ctx)
 			requestAnimationFrame(drawAnimation);
 		}
 
