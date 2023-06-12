@@ -1,4 +1,5 @@
-export function border(ctx: CanvasRenderingContext2D, title: string,
+export function border(ctx: CanvasRenderingContext2D,
+						title: string,
 						offset_title = { x: 0, y: 0}) {
 	const win = {
 		w: ctx.canvas.clientWidth,

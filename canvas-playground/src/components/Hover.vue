@@ -1,7 +1,8 @@
 <script setup lang='ts'>
 	import { ref, onMounted } from 'vue';
-	import { getRandom, isMobileDevice } from '../lib/generic.ts';
+	import { get_boolean, get_random, is_mobile_device } from '../lib/generic.ts';
 	import { border, buttons, draw_circle, drawing_styles } from '../lib/draw.ts';
+	import { handle_resize, handle_mouse_move, handle_mouse_click, handle_esc_click, handle_touch_start, handle_touch_move, handle_touch_end } from '../lib/events.ts';
 
 	// Arguments
 	const props = defineProps({
@@ -73,34 +74,20 @@
 		const rect = canvas.getBoundingClientRect();
 
 		function createBall(): Circle {
-			let dx = getRandom(-2, 2);
-			while (dx == 0) dx = getRandom(-2, 2);
-			let dy = getRandom(-2, 2);
-			while (dy == 0) dy = getRandom(-2, 2);
+			let dx = (get_boolean() ? 1:-1) * get_random(1, 2);
+			let dy = (get_boolean() ? 1:-1) * get_random(1, 2);
 			const { x, y, radius, color } = {
-				x: getRandom(0, win.w),
-				y: getRandom(0, win.h),
-				radius: getRandom(5, 5),
-				color: colors[getRandom(0, colorsLength - 1)]
+				x: get_random(0, win.w),
+				y: get_random(0, win.h),
+				radius: get_random(5, 5),
+				color: colors[get_random(0, colorsLength - 1)]
 			};
 			return new Circle(x, y, dx, dy, radius, color);
 		}
 
 		canvas.style.background = '#ffffff';
 
-		// Shapes
-		interface CircleInterface {
-			x: number;
-			y: number;
-			dx: number;
-			dy: number;
-			r: number;
-			color: string;
-			draw: () => void;
-			update: () => void;
-		}
-
-		class Circle implements CircleInterface {
+		class Circle {
 			x: number;
 			y: number;
 			dx: number;
@@ -134,37 +121,47 @@
 				this.y += this.dy;
 			}
 
-			handleTouch(): void {
-				const x = this.x + rect.left;
-				const y = this.y + rect.top;
-				const winw20 = win.w/20;
-				if (mouse.x - x <   winw20 &&
-					mouse.x - x > - winw20 &&
-					mouse.y - y <   winw20 &&
-					mouse.y - y > - winw20) {
-					if (this.r < Math.max(winw20, 75)) {
-						this.r += 10;
-					}
-				} else {
-					for (let t of touch)
-					{
-						if (t.clientX - x <   winw20 &&
-							t.clientX - x > - winw20 &&
-							t.clientY - y <   winw20 &&
-							t.clientY - y > - winw20) {
-							if (this.r < Math.max(winw20, 75)) {
-								this.r += 10;
-							}
-						}
-					}
-					if (this.r > 5) {
-						this.r--;
-					}
+			private expand(winw20: number): void {
+				if (this.r < Math.max(winw20, 75)) {
+					this.r += 10;
 				}
 			}
 
+			private shrink(): void {
+				if (this.r > 5) {
+					this.r--;
+				}
+			}
+
+			private handle_touch(): void {
+				const x = this.x + rect.left;
+				const y = this.y + rect.top;
+				const winw20 = win.w/20;
+
+				if (!is_mobile_device()) {
+					if (mouse.x - x <   winw20 &&
+						mouse.x - x > - winw20 &&
+						mouse.y - y <   winw20 &&
+						mouse.y - y > - winw20)
+						this.expand(winw20);
+					else this.shrink();
+					return;
+				}
+
+				for (let t of touch)
+				{
+					if (t.clientX - x <   winw20 &&
+						t.clientX - x > - winw20 &&
+						t.clientY - y <   winw20 &&
+						t.clientY - y > - winw20)
+						this.expand(winw20);
+					else this.shrink();
+				}
+				
+			}
+
 			update(): void {
-				this.handleTouch();
+				this.handle_touch();
 				this.move();
 				this.draw();
 			}
@@ -172,97 +169,19 @@
 
 		// Events
 		if (props.fullscreen) {
-			window.addEventListener (
-				'resize',
-				function () {
-					win.w = window.innerWidth;
-					win.w2 = window.innerWidth/2;
-					win.h = window.innerHeight;
-					win.h2 = window.innerHeight/2;
-					ctx.canvas.width  = win.w;
-					ctx.canvas.height = win.h;
-				}
-			)
+			window.addEventListener ('resize', () => handle_resize(win, window.innerWidth, window.innerHeight, ctx))
 		}
 
 		// Computer
-		if(!isMobileDevice()) {
-			window.addEventListener (
-				'mousemove',
-				(e) => {
-					mouse.x = e.x;
-					mouse.y = e.y;
-				}
-			)
-		}
-
-		window.addEventListener (
-			'click',
-			(e) => {
-				if (e.clientX > win.w2)
-					for (let i = 0; i < 10; i++)
-						circles.push(createBall());
-				if (e.clientX < win.w2)
-					circles.splice(0, 10);
-			}
-		)
-
-		window .addEventListener(
-			'keydown',
-			(e) => {
-				if (e.isComposing || e.keyCode === 27) {
-					debug = (debug + 1) % drawing_styles;
-				}
-			}
-		);
-
-		// Cellphone
-		if(isMobileDevice()) {
-			window.addEventListener (
-				'touchstart',
-				(e) => {
-					for (let t of e.changedTouches) {
-						if (t.clientX > win.w2)
-							for (let i = 0; i < 10; i++)
-								circles.push(createBall());
-						if (t.clientX < win.w2)
-							circles.splice(0, 10);
-						touch.push(t);
-					}
-					ctx.strokeStyle = borderColorStroke;
-					ctx.fillStyle = borderColorFill;
-				}
-			)
-
-			window.addEventListener (
-				'touchmove',
-				(e) => {
-					for (let t of e.changedTouches)
-						for (let i=0; i<touch.length; ++i)
-							if (t.target == touch[i].target)
-								touch[i] = t;
-				}
-			)
-
-			window.addEventListener (
-				'touchend',
-				(e) => {
-				for (let t of e.changedTouches) {
-					const index = touch.findIndex(item => item.target === t.target);
-						if (index !== -1) touch.splice(index, 1);
-					}
-				}
-			)
-
-			window.addEventListener(
-				'touchcancel',
-				(e) => {
-				for (let t of e.changedTouches) {
-					const index = touch.findIndex(item => item.target === t.target);
-						if (index !== -1) touch.splice(index, 1);
-					}
-				}
-			);
+		if(!is_mobile_device()) {
+			window.addEventListener ('mousemove', (e) => handle_mouse_move(e, mouse));
+			window.addEventListener ('click', (e) => handle_mouse_click(e, win, circles, createBall));
+			window .addEventListener('keydown', (e) => { debug = handle_esc_click(e, drawing_styles, debug) });
+		} else {
+			window.addEventListener ('touchstart', (e) => handle_touch_start(e, win, circles, createBall, touch));
+			window.addEventListener ('touchmove', (e) => handle_touch_move(e, touch));
+			window.addEventListener ('touchend', (e) => handle_touch_end(e, touch));
+			window.addEventListener('touchcancel', (e) => handle_touch_end(e, touch));
 		}
 
 		// Main function

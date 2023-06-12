@@ -1,8 +1,9 @@
 <script setup lang='ts'>
 	import { ref, onMounted } from 'vue';
-	import { getRandom, isMobileDevice } from '../lib/generic.ts';
+	import { get_random, is_mobile_device } from '../lib/generic.ts';
 	import { border, buttons, draw_circle, drawing_styles } from '../lib/draw.ts';
-	import { getDistance, getDirection } from '../lib/physics.ts';
+	import { get_distance, get_direction } from '../lib/physics.ts';
+	import { handle_resize } from '../lib/events.ts';
 
 	// Arguments
 	const props = defineProps({
@@ -81,15 +82,15 @@
 		canvas.style.background = '#ffffff';
 
 		function createBall(): Circle {
-			let dx = getRandom(-10, 10);
-			while (dx == 0) dx = getRandom(-10, 10);
-			let dy = getRandom(-10, 10);
-			while (dy == 0) dy = getRandom(-10, 10);
+			let dx = get_random(-10, 10);
+			while (dx == 0) dx = get_random(-10, 10);
+			let dy = get_random(-10, 10);
+			while (dy == 0) dy = get_random(-10, 10);
 			const { x, y, radius, color, elasticity } = {
-				x: getRandom(0, win.w),
-				y: getRandom(0, win.h),
-				radius: getRandom(10, 50),
-				color: colors[getRandom(0, colorsLength - 1)],
+				x: get_random(0, win.w),
+				y: get_random(0, win.h),
+				radius: get_random(10, 50),
+				color: colors[get_random(0, colorsLength - 1)],
 				elasticity: 0.5 + (Math.random() * 0.5)
 			};
 			return new Circle(x, y, dx, dy, radius, color, elasticity);
@@ -100,10 +101,10 @@
 				const c1 = circles[i];
 				for (let j = i + 1; j < circles.length; j++) {
 					const c2 = circles[j];
-					const dist = getDistance(c1.pos, c2.pos);
+					const dist = get_distance(c1.pos, c2.pos);
 					const minDist = c1.r + c2.r;
 					if (dist < minDist) {
-						const d = getDirection(c2.pos, c1.pos);
+						const d = get_direction(c2.pos, c1.pos);
 						const v1dot = c1.vel.dx * d.x + c1.vel.dy * d.y;
 						const v2dot = c2.vel.dx * d.x + c2.vel.dy * d.y;
 						const m1 = c1.r ** 2;
@@ -123,10 +124,10 @@
 					}
 				}
 
-				const dist = getDistance(c1.pos, mouse.pos);
+				const dist = get_distance(c1.pos, mouse.pos);
 				const minDist = c1.r + mouse.r;
 				if (dist < minDist) {
-					const d = getDirection(mouse.pos, c1.pos);
+					const d = get_direction(mouse.pos, c1.pos);
 					const v1dot = c1.vel.dx * d.x + c1.vel.dy * d.y;
 					const v2dot = mouse.vel.dx * d.x + mouse.vel.dy * d.y;
 					const m1 = c1.r ** 2;
@@ -218,7 +219,7 @@
 		}
 
 		// Events
-		if (!isMobileDevice()) {
+		if (!is_mobile_device()) {
 			window.addEventListener (
 				'mousemove',
 				(e) => {
@@ -260,7 +261,6 @@
 					}
 				}
 			)
-
 			window.addEventListener (
 				'touchmove',
 				(e) => {
@@ -272,7 +272,6 @@
 					}
 				}
 			)
-
 			window.addEventListener (
 				'touchend',
 				() => {
@@ -282,7 +281,6 @@
 					mouse.pos.y = -1000;
 				}
 			)
-
 			window.addEventListener(
 				'touchcancel',
 				() => {
@@ -295,17 +293,7 @@
 		}
 
 		if (props.fullscreen) {
-			window.addEventListener (
-				'resize',
-				function () {
-					win.w = window.innerWidth;
-					win.w2 = window.innerWidth/2;
-					win.h = window.innerHeight;
-					win.h2 = window.innerHeight/2;
-					ctx.canvas.width  = win.w;
-					ctx.canvas.height = win.h;
-				}
-			)
+			window.addEventListener ('resize', () => handle_resize(win, window.innerWidth, window.innerHeight, ctx))
 		}
 
 		function drawMouse(): void {
@@ -333,7 +321,7 @@
 			ctx.fillStyle = borderColorFill;
 			ctx.strokeStyle = borderColorStroke;
 			border(ctx, 'Collision');
-			if (!isMobileDevice())
+			if (!is_mobile_device())
 				buttons(ctx);
 			requestAnimationFrame(drawAnimation);
 		}

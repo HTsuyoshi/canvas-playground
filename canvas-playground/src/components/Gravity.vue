@@ -1,7 +1,8 @@
 <script setup lang='ts'>
 	import { ref, onMounted } from 'vue';
-	import { getRandom, isMobileDevice } from '../lib/generic.ts';
+	import { get_random, is_mobile_device } from '../lib/generic.ts';
 	import { border, buttons, draw_circle, drawing_styles } from '../lib/draw.ts';
+	import { handle_resize, handle_mouse_click, handle_mouse_move, handle_esc_click } from '../lib/events.ts';
 
 	// Arguments
 	const props = defineProps({
@@ -75,15 +76,15 @@
 		canvas.height = win.h;
 
 		function createBall(): Circle {
-			let dx = getRandom(-2, 2);
-			while (dx == 0) dx = getRandom(-2, 2);
-			let dy = getRandom(-2, 2);
-			while (dy == 0) dy = getRandom(-2, 2);
+			let dx = get_random(-2, 2);
+			while (dx == 0) dx = get_random(-2, 2);
+			let dy = get_random(-2, 2);
+			while (dy == 0) dy = get_random(-2, 2);
 			const { x, y, radius, color, friction } = {
-				x: getRandom(0, win.w),
-				y: getRandom(0, win.h),
-				radius: getRandom(5, 5),
-				color: colors[getRandom(0, colorsLength - 1)],
+				x: get_random(0, win.w),
+				y: get_random(0, win.h),
+				radius: get_random(5, 5),
+				color: colors[get_random(0, colorsLength - 1)],
 				friction: Math.random()
 			};
 			return new Circle(x, y, dx, dy, radius, color, friction);
@@ -166,12 +167,12 @@
 		}
 
 		// Event
-		if (!isMobileDevice()) {
+		window.addEventListener ('click', (e) => handle_mouse_click(e, win, circles, createBall));
+		if (!is_mobile_device()) {
 			window.addEventListener (
 				'mousemove',
 				(e) => {
-					mouse.x = e.x;
-					mouse.y = e.y;
+					handle_mouse_move(e, mouse);
 
 					const x = mouse.x - (win.w2);
 					const y = mouse.y - (win.h2);
@@ -181,31 +182,8 @@
 					gravityDirection.y = y/magnitude;
 				}
 			)
-		}
-
-		window.addEventListener (
-			'click',
-			(e) => {
-				if (e.clientX > win.w2)
-					for (let i = 0; i < 10; i++)
-						circles.push(createBall());
-				if (e.clientX < win.w2)
-					circles.splice(0, 10);
-				ctx.strokeStyle = borderColorStroke;
-				ctx.fillStyle = borderColorFill;
-			}
-		)
-
-		window .addEventListener(
-			'keydown',
-			(e) => {
-				if (e.isComposing || e.keyCode === 27) {
-					debug = (debug + 1) % drawing_styles;
-				}
-			}
-		);
-
-		if (isMobileDevice()) {
+			window .addEventListener('keydown', (e) => { debug = handle_esc_click(e, drawing_styles, debug) });
+		} else {
 			if (window.DeviceOrientationEvent) {
 				window.addEventListener(
 				'deviceorientation',
@@ -238,17 +216,7 @@
 		}
 
 		if (props.fullscreen) {
-			window.addEventListener (
-				'resize',
-				function () {
-					win.w = window.innerWidth;
-					win.w2 = window.innerWidth/2;
-					win.h = window.innerHeight;
-					win.h2 = window.innerHeight/2;
-					ctx.canvas.width  = win.w;
-					ctx.canvas.height = win.h;
-				}
-			)
+			window.addEventListener ('resize', () => handle_resize(win, window.innerWidth, window.innerHeight, ctx))
 		}
 
 		// Main function

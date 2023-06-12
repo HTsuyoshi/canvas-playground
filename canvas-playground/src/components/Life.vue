@@ -1,7 +1,8 @@
 <script setup lang='ts'>
 	import { ref, onMounted } from 'vue';
-	import { isMobileDevice } from '../lib/generic.ts'
+	import { is_mobile_device } from '../lib/generic.ts'
 	import { border, life_buttons } from '../lib/draw.ts'
+	import { handle_resize } from '../lib/events.ts';
 
 	// Arguments
 	const props = defineProps({
@@ -198,7 +199,7 @@
 		}
 
 		// Events
-		if(!isMobileDevice()) {
+		if(!is_mobile_device()) {
 			window.addEventListener (
 				'mousemove',
 				(e) => {
@@ -208,13 +209,8 @@
 						game.mouseAdd(e.clientX, e.clientY);
 					}
 				}
-			)
-			window.addEventListener (
-				'click',
-				() => {
-					updateGame = !updateGame;
-				}
-			)
+			);
+			window.addEventListener ('click', () => { updateGame = !updateGame; });
 			window.addEventListener(
 				'contextmenu',
 				(e) => {
@@ -230,8 +226,7 @@
 						game.mouseAdd(t.clientX, t.clientY);
 					}
 				}
-			)
-
+			);
 			window.addEventListener (
 				'touchmove',
 				(e) => {
@@ -239,22 +234,17 @@
 						game.mouseAdd(t.clientX, t.clientY);
 					}
 				}
-			)
+			);
 		}
 
 		if (props.fullscreen) {
 			window.addEventListener (
 				'resize',
-				function () {
-					win.w = window.innerWidth;
-					win.w2 = window.innerWidth/2;
-					win.h = window.innerHeight;
-					win.h2 = window.innerHeight/2;
-					ctx.canvas.width  = win.w;
-					ctx.canvas.height = win.h;
+				() => {
+					handle_resize(win, window.innerWidth, window.innerHeight, ctx)
 					game.resize();
 				}
-			)
+			);
 		}
 
 		// Main function
@@ -267,7 +257,7 @@
 
 		let t = 0;
 		let delay = 1000 / 24;
-		if(isMobileDevice()) {
+		if(is_mobile_device()) {
 			delay = 1000 / 18;
 		}
 
@@ -276,7 +266,7 @@
 			ctx.clearRect(0, 0, win.w, win.h);
 			game.draw();
 			border(ctx, 'Life', { x: 0, y: -200 });
-			if (!isMobileDevice())
+			if (!is_mobile_device())
 				life_buttons(ctx);
 			if (dt >= delay) {
 				t = timestamp;

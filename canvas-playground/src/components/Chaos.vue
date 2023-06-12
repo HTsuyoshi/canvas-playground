@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 	import { ref, onMounted } from 'vue';
 	import { border } from '../lib/draw.ts';
+	import { handle_resize } from '../lib/events.ts';
 
 	// Arguments
 	const props = defineProps({
@@ -187,19 +188,8 @@
 			return p;
 		}
 
-		// Events
 		if (props.fullscreen) {
-			window.addEventListener (
-				'resize',
-				function () {
-					win.w = window.innerWidth;
-					win.w2 = window.innerWidth/2;
-					win.h = window.innerHeight;
-					win.h2 = window.innerHeight/2;
-					ctx.canvas.width  = win.w;
-					ctx.canvas.height = win.h;
-				}
-			)
+			window.addEventListener ('resize', () => handle_resize(win, window.innerWidth, window.innerHeight, ctx))
 		}
 
 		// Main function
