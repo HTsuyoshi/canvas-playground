@@ -30,6 +30,12 @@
 		link: '/canvas/life',
 		img: '/canvas/imgs/life.png',
 	}
+
+	const project_6 = {
+		title: 'Snake',
+		link: '/canvas/Snake',
+		img: '/canvas/imgs/snake.png',
+	}
 </script>
 
 <template>
@@ -41,6 +47,7 @@
 			<Card :title='project_3.title' :link='project_3.link' :img='project_3.img'></Card>
 			<Card :title='project_4.title' :link='project_4.link' :img='project_4.img'></Card>
 			<Card :title='project_5.title' :link='project_5.link' :img='project_5.img'></Card>
+			<Card :title='project_6.title' :link='project_6.link' :img='project_6.img'></Card>
 		</div>
 	</div>
 </template>

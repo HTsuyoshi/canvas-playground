@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 	import { ref, onMounted } from 'vue';
-	import { get_random, is_mobile_device } from '../lib/generic.ts';
+	import { get_random, get_boolean, is_mobile_device } from '../lib/generic.ts';
 	import { border, buttons, draw_circle, drawing_styles } from '../lib/draw.ts';
 	import { get_distance, get_direction } from '../lib/physics.ts';
 	import { handle_resize } from '../lib/events.ts';
@@ -82,10 +82,8 @@
 		canvas.style.background = '#ffffff';
 
 		function createBall(): Circle {
-			let dx = get_random(-10, 10);
-			while (dx == 0) dx = get_random(-10, 10);
-			let dy = get_random(-10, 10);
-			while (dy == 0) dy = get_random(-10, 10);
+			let dx = (get_boolean() ? 1 : -1) * get_random(1, 10);
+			let dy = (get_boolean() ? 1 : -1) * get_random(1, 10);
 			const { x, y, radius, color, elasticity } = {
 				x: get_random(0, win.w),
 				y: get_random(0, win.h),

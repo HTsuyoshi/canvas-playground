@@ -101,15 +101,11 @@ export function life_buttons(ctx: CanvasRenderingContext2D) {
 
 export const drawing_styles = 5;
 
-export function draw_circle(ctx: CanvasRenderingContext2D,
-							x: number, y: number,
-							dx: number, dy: number,
-							r: number, debug: number,
-							c: string, border_c: string) {
-	ctx.beginPath();
-	ctx.arc(x, y, r, 0, Math.PI * 2);
-	ctx.fillStyle = c;
-	ctx.fill();
+function draw_debug(ctx: CanvasRenderingContext2D,
+				x: number, y: number,
+				dx: number, dy: number,
+				r: number, debug: number,
+				border_c: string) {
 
 	ctx.strokeStyle = border_c;
 	if (debug >= 1) {
@@ -148,4 +144,30 @@ export function draw_circle(ctx: CanvasRenderingContext2D,
 		ctx.lineTo(x, ctx.canvas.clientHeight);
 	}
 	ctx.stroke();
+}
+
+export function draw_circle(ctx: CanvasRenderingContext2D,
+							x: number, y: number,
+							dx: number, dy: number,
+							r: number, debug: number,
+							c: string, border_c: string) {
+	ctx.beginPath();
+	ctx.arc(x, y, r, 0, Math.PI * 2);
+	ctx.fillStyle = c;
+	ctx.fill();
+
+	draw_debug(ctx, x, y, dx, dy, r, debug, border_c);
+}
+
+export function draw_square(ctx: CanvasRenderingContext2D,
+							x: number, y: number,
+							dx: number, dy: number,
+							l: number, debug: number,
+							c: string, border_c: string) {
+	ctx.beginPath();
+	ctx.rect(x - (l/2), y - (l/2), l, l);
+	ctx.fillStyle = c;
+	ctx.fill();
+
+	draw_debug(ctx, x, y, dx, dy, l, debug, border_c);
 }
