@@ -33,7 +33,7 @@
 
 	const project_6 = {
 		title: 'Snake',
-		link: '/canvas/Snake',
+		link: '/canvas/snake',
 		img: '/canvas/imgs/snake.png',
 	}
 </script>
