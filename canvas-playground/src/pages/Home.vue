@@ -57,8 +57,8 @@
 #background {
 	background-color: #ffffff;
 
-	min-height: 100vh;
-	min-width: 100vw;
+	min-height: 100svh;
+	min-width: 100svw;
 
 	display: flex;
 	justify-content: space-evenly;
