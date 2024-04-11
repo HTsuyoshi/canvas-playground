@@ -10,37 +10,37 @@ import Snake from './pages/Snake.vue'
 const router = createRouter({
 	history: createWebHistory(),
 	routes: [ {
-			path: '/canvas',
+			path: '/',
 			name: 'CanvasHome',
 			component: Home
 		},
 		{
-			path: '/canvas/hover',
+			path: '/hover',
 			name: 'Hover',
 			component: Hover
 		},
 		{
-			path: '/canvas/gravity',
+			path: '/gravity',
 			name: 'Gravity',
 			component: Gravity
 		},
 		{
-			path: '/canvas/collision',
+			path: '/collision',
 			name: 'Collision',
 			component: Collision
 		},
 		{
-			path: '/canvas/chaos',
+			path: '/chaos',
 			name: 'Chaos',
 			component: Chaos
 		},
 		{
-			path: '/canvas/life',
+			path: '/life',
 			name: 'Life',
 			component: Life
 		},
 		{
-			path: '/canvas/snake',
+			path: '/snake',
 			name: 'Snake',
 			component: Snake
 		}

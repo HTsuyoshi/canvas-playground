@@ -3,38 +3,38 @@
 
 	const project_1 = {
 		title: 'Hover',
-		link: '/canvas/hover',
-		img: '/canvas/imgs/hover.png',
+		link: '/hover',
+		img: '/imgs/hover.png',
 	}
 
 	const project_2 = {
 		title: 'Gravity',
-		link: '/canvas/gravity',
-		img: '/canvas/imgs/gravity.png',
+		link: '/gravity',
+		img: '/imgs/gravity.png',
 	}
 
 	const project_3 = {
 		title: 'Collision',
-		link: '/canvas/collision',
-		img: '/canvas/imgs/collision.png',
+		link: '/collision',
+		img: '/imgs/collision.png',
 	}
 
 	const project_4 = {
 		title: 'Chaos',
-		link: '/canvas/chaos',
-		img: '/canvas/imgs/chaos.png',
+		link: '/chaos',
+		img: '/imgs/chaos.png',
 	}
 
 	const project_5 = {
 		title: 'Life',
-		link: '/canvas/life',
-		img: '/canvas/imgs/life.png',
+		link: '/life',
+		img: '/imgs/life.png',
 	}
 
 	const project_6 = {
 		title: 'Snake',
-		link: '/canvas/snake',
-		img: '/canvas/imgs/snake.png',
+		link: '/snake',
+		img: '/imgs/snake.png',
 	}
 </script>
 
